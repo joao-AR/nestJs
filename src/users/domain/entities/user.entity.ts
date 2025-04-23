@@ -1,7 +1,7 @@
 import { Entity } from '@/shared/domain/entities/entity';
 import { UserValidatorFactory } from '../validators/user.validator';
 import { th } from '@faker-js/faker/.';
-import { EntityValidatorError } from '@/shared/domain/errors/validation-errors';
+import { EntityValidatorError } from '@/shared/domain/errors/validation-error';
 
 export type UserProps = {
   name: string;
@@ -57,7 +57,7 @@ export class UserEntity extends Entity<UserProps> {
   static validate(props: UserProps) {
     const validator = UserValidatorFactory.create();
     const isValid = validator.validate(props);
-
+    
     if (!isValid) {
       throw new EntityValidatorError(validator.errors);
     }
