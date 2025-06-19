@@ -1,12 +1,9 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigModuleOptions } from '@nestjs/config';
-import { join } from 'node:path';
+import { join } from 'path';
 import { EnvConfigService } from './env-config.service';
 
-@Module({
-  providers: [EnvConfigService],
-  exports: [EnvConfigService],
-})
+@Module({})
 export class EnvConfigModule {
   static forRoot(options: ConfigModuleOptions = {}): DynamicModule {
     return {
@@ -19,7 +16,8 @@ export class EnvConfigModule {
           ],
         }),
       ],
-      exports: [EnvConfigService], // Exportando para que outros módulos possam usá-lo
+      providers: [EnvConfigService],
+      exports: [EnvConfigService],
     };
   }
 }
