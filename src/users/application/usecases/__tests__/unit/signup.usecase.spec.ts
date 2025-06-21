@@ -1,4 +1,4 @@
-import { UserInMemoryRepository } from '@/shared/infrastructure/database/in-memory/repositories/user-in-memory.repository';
+import { UserInMemoryRepository } from '@/users/infrastructure/databases/in-memory/repositories/user-in-memory.repository';
 import { SignUpUseCase } from '../../signup.usecase';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-provider/bcryptjs-hash.provider';

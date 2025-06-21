@@ -1,4 +1,4 @@
-import { UserInMemoryRepository } from '@/shared/infrastructure/database/in-memory/repositories/user-in-memory.repository';
+import { UserInMemoryRepository } from '@/users/infrastructure/databases/in-memory/repositories/user-in-memory.repository';
 import { GetUserUseCase } from '../../getUser.usecase';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
