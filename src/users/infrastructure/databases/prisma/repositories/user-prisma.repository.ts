@@ -26,8 +26,6 @@ export class UserPrismaRepository implements UserRepository.Repository {
         email,
       },
     });
-
-    // console.log('USR1: ' + email + '->' + user);
     if (user) throw new ConflictError('Email address already in use');
   }
 
