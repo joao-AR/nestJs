@@ -10,56 +10,56 @@ describe('User entity unit tests', () => {
   });
 
   it('Constructor method', () => {
-    expect(sut.props.name).toEqual(props.name);
-    expect(sut.props.email).toEqual(props.email);
-    expect(sut.props.createdAt).toBeInstanceOf(Date);
+    expect(sut.name).toEqual(props.name);
+    expect(sut.email).toEqual(props.email);
+    expect(sut.createdAt).toBeInstanceOf(Date);
     expect(UserEntity.validate).toHaveBeenCalled();
   });
 
   it('Getter of name field', () => {
-    expect(sut.props.name).toBeDefined();
-    expect(sut.props.name).toEqual(props.name);
-    expect(typeof sut.props.name).toBe('string');
+    expect(sut.name).toBeDefined();
+    expect(sut.name).toEqual(props.name);
+    expect(typeof sut.name).toBe('string');
   });
 
   it('Setter of name field', () => {
     sut['name'] = 'new name';
-    expect(sut.props.name).toEqual('new name');
-    expect(typeof sut.props.name).toBe('string');
+    expect(sut.name).toEqual('new name');
+    expect(typeof sut.name).toBe('string');
   });
 
   it('Getter of email field', () => {
-    expect(sut.props.email).toBeDefined();
-    expect(sut.props.email).toEqual(props.email);
-    expect(typeof sut.props.email).toBe('string');
+    expect(sut.email).toBeDefined();
+    expect(sut.email).toEqual(props.email);
+    expect(typeof sut.email).toBe('string');
   });
 
   it('Getter of password field', () => {
-    expect(sut.props.password).toBeDefined();
-    expect(sut.props.password).toEqual(props.password);
-    expect(typeof sut.props.password).toBe('string');
+    expect(sut.password).toBeDefined();
+    expect(sut.password).toEqual(props.password);
+    expect(typeof sut.password).toBe('string');
   });
 
   it('Setter of password field', () => {
     sut['password'] = 'new pass';
-    expect(sut.props.password).toEqual('new pass');
-    expect(typeof sut.props.password).toBe('string');
+    expect(sut.password).toEqual('new pass');
+    expect(typeof sut.password).toBe('string');
   });
 
   it('Getter of createdAt field', () => {
-    expect(sut.props.createdAt).toBeDefined();
-    expect(sut.props.createdAt).toBeInstanceOf(Date);
+    expect(sut.createdAt).toBeDefined();
+    expect(sut.createdAt).toBeInstanceOf(Date);
   });
 
   it('Should update a user', () => {
     sut.updateName('new name');
     expect(UserEntity.validate).toHaveBeenCalled();
-    expect(sut.props.name).toEqual('new name');
+    expect(sut.name).toEqual('new name');
   });
 
   it('Should update the password field', () => {
     sut.updatePassword('new pass');
     expect(UserEntity.validate).toHaveBeenCalled();
-    expect(sut.props.password).toEqual('new pass');
+    expect(sut.password).toEqual('new pass');
   });
 });
