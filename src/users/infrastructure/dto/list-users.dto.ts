@@ -4,11 +4,9 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class ListUsersDto implements ListUsersUseCase.Input {
   @IsOptional()
-  @IsNumber()
   page?: number;
 
   @IsOptional()
-  @IsNumber()
   perPage?: number;
 
   @IsOptional()

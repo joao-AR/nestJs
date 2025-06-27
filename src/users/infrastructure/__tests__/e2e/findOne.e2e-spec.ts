@@ -12,13 +12,12 @@ import { instanceToPlain } from 'class-transformer';
 import { applyGlobalConfig } from '@/global-config';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
-import { UpdateUserDto } from '../../dto/update-user.dto';
 
-describe('UserController PUT e2e tests', () => {
+describe('UserController GET e2e tests', () => {
   let app: INestApplication;
   let module: TestingModule;
   let repository: UserRepository.Repository;
-  let updateUserDto: UpdateUserDto;
+
   const prismaService = new PrismaClient();
   let entity: UserEntity;
   beforeAll(async () => {
@@ -39,47 +38,25 @@ describe('UserController PUT e2e tests', () => {
   });
 
   beforeEach(async () => {
-    updateUserDto = {
-      name: 'new Name',
-    };
-
     await prismaService.user.deleteMany();
     entity = new UserEntity(userDataBuilder({}));
     await repository.insert(entity);
   });
 
-  describe('PUT /users/:id', () => {
-    it('Should update a user', async () => {
+  describe('GET /users/:id', () => {
+    it('Should get a user', async () => {
       const res = await request(app.getHttpServer())
-        .put(`/users/${entity._id}`)
-        .send(updateUserDto)
+        .get(`/users/${entity._id}`)
         .expect(200);
 
-      const user = await repository.findById(entity._id);
-
-      const presenter = UsersController.userToResponse(user.toJson());
+      const presenter = UsersController.userToResponse(entity.toJson());
       const serialized = instanceToPlain(presenter);
       expect(res.body.data).toStrictEqual(serialized);
     });
 
-    it('Should return error with 422 code when request body is invalid', async () => {
-      delete updateUserDto.name;
-      const res = await request(app.getHttpServer())
-        .put(`/users/${entity._id}`)
-        .send(updateUserDto)
-        .expect(422);
-
-      expect(res.body.error).toBe('Unprocessable Entity');
-      expect(res.body.message).toEqual([
-        'name should not be empty',
-        'name must be a string',
-      ]);
-    });
-
     it('Should return error with 404 code when id is invalid', async () => {
-      const res = await request(app.getHttpServer())
-        .put('/users/fakeId')
-        .send(updateUserDto)
+      await request(app.getHttpServer())
+        .get('/users/fakeId')
         .expect(404)
         .expect({
           statusCode: 404,
