@@ -49,7 +49,7 @@ describe('UserController PUT e2e tests', () => {
   });
 
   describe('PUT /users/:id', () => {
-    it('Should create a user', async () => {
+    it('Should update a user', async () => {
       const res = await request(app.getHttpServer())
         .put(`/users/${entity._id}`)
         .send(updateUserDto)
