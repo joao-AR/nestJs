@@ -11,6 +11,10 @@ import { UpdateUserPasswordUseCase } from '@/users/application/usecases/updateUs
 import { UpdatePasswordDto } from '../../dto/update-password.dto';
 import { GetUserUseCase } from '@/users/application/usecases/getUser.usecase';
 import { ListUsersUseCase } from '@/users/application/usecases/listUsers.usecase';
+import {
+  UserCollectionPresenter,
+  UserPresenter,
+} from '@/users/presenters/user.presenter';
 
 describe('UsersController', () => {
   let sut: UsersController;
@@ -33,7 +37,7 @@ describe('UsersController', () => {
     expect(sut).toBeDefined();
   });
 
-  it('should create a user', async () => {
+  it('Should create a user', async () => {
     const output: SignUpUseCase.Output = props;
 
     const mockSignupUseCase = {
@@ -48,12 +52,13 @@ describe('UsersController', () => {
       password: '1234',
     };
 
-    const res = await sut.create(input);
-    expect(output).toMatchObject(res);
+    const presenter = await sut.create(input);
+    expect(presenter).toBeInstanceOf(UserPresenter);
+    expect(presenter).toStrictEqual(new UserPresenter(output));
     expect(mockSignupUseCase.execute).toHaveBeenCalledWith(input);
   });
 
-  it('should authenticate a user', async () => {
+  it('Should authenticate a user', async () => {
     const output: SignInUseCase.Output = props;
 
     const mockSigninUseCase = {
@@ -67,12 +72,13 @@ describe('UsersController', () => {
       password: '1234',
     };
 
-    const res = await sut.login(input);
-    expect(output).toMatchObject(res);
+    const presenter = await sut.login(input);
+    expect(presenter).toBeInstanceOf(UserPresenter);
+    expect(presenter).toStrictEqual(new UserPresenter(output));
     expect(mockSigninUseCase.execute).toHaveBeenCalledWith(input);
   });
 
-  it('should update a user', async () => {
+  it('Should update a user', async () => {
     const output: UpdateUserUseCase.Output = props;
 
     const mockUpdateUserUseCase = {
@@ -85,15 +91,16 @@ describe('UsersController', () => {
       name: 'updated Name',
     };
 
-    const res = await sut.update(id, input);
-    expect(output).toMatchObject(res);
+    const presenter = await sut.update(id, input);
+    expect(presenter).toBeInstanceOf(UserPresenter);
+    expect(presenter).toStrictEqual(new UserPresenter(output));
     expect(mockUpdateUserUseCase.execute).toHaveBeenCalledWith({
       id,
       ...input,
     });
   });
 
-  it('should update users password', async () => {
+  it('Should update the user password', async () => {
     const output: UpdateUserPasswordUseCase.Output = props;
 
     const mockUpdateUserPasswordUseCase = {
@@ -107,15 +114,16 @@ describe('UsersController', () => {
       oldPassword: 'oldPass',
     };
 
-    const res = await sut.updatePassword(id, input);
-    expect(output).toMatchObject(res);
+    const presenter = await sut.updatePassword(id, input);
+    expect(presenter).toBeInstanceOf(UserPresenter);
+    expect(presenter).toStrictEqual(new UserPresenter(output));
     expect(mockUpdateUserPasswordUseCase.execute).toHaveBeenCalledWith({
       id,
       ...input,
     });
   });
 
-  it('should delete a user', async () => {
+  it('Should delete an user', async () => {
     const output = undefined;
 
     const mockDeleteUserUseCase = {
@@ -129,7 +137,7 @@ describe('UsersController', () => {
     expect(mockDeleteUserUseCase.execute).toHaveBeenCalledWith({ id });
   });
 
-  it('should get a user', async () => {
+  it('Should get an user', async () => {
     const output: GetUserUseCase.Output = props;
 
     const mockGetUserUseCase = {
@@ -138,12 +146,13 @@ describe('UsersController', () => {
 
     sut['getUserUseCase'] = mockGetUserUseCase as any;
 
-    const res = await sut.findOne(id);
-    expect(output).toStrictEqual(res);
+    const presenter = await sut.findOne(id);
+    expect(presenter).toBeInstanceOf(UserPresenter);
+    expect(presenter).toStrictEqual(new UserPresenter(output));
     expect(mockGetUserUseCase.execute).toHaveBeenCalledWith({ id });
   });
 
-  it('should list users', async () => {
+  it('Should list users', async () => {
     const output: ListUsersUseCase.Output = {
       items: [props],
       currentPage: 1,
@@ -163,8 +172,9 @@ describe('UsersController', () => {
       perPage: 1,
     };
 
-    const res = await sut.search(searchParams);
-    expect(output).toStrictEqual(res);
+    const presenter = await sut.search(searchParams);
+    expect(presenter).toBeInstanceOf(UserCollectionPresenter);
+    expect(presenter).toStrictEqual(new UserCollectionPresenter(output));
     expect(mockListUsersUseCase.execute).toHaveBeenCalledWith(searchParams);
   });
 });

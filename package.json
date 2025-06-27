@@ -18,7 +18,7 @@
     "test:int": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.int.config.ts",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.e2e.config.ts"
   },
   "dependencies": {
     "@fastify/middie": "^9.0.3",
@@ -30,6 +30,7 @@
     "@nestjs/platform-fastify": "^11.0.12",
     "@prisma/client": "^6.10.1",
     "bcryptjs": "^3.0.2",
+    "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv-cli": "^8.0.0",
     "inquirer": "^12.5.0",
