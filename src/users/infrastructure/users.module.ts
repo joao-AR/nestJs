@@ -12,8 +12,10 @@ import { DeleteUserUseCase } from '../application/usecases/deleteUser.usecase';
 import { UsersController } from './users.controller';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 import { UserPrismaRepository } from './databases/prisma/repositories/user-prisma.repository';
+import { AuthModule } from '@/auth/infrastructure/auth.module';
 
 @Module({
+  imports: [AuthModule],
   controllers: [UsersController],
   providers: [
     {

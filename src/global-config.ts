@@ -1,3 +1,4 @@
+import { InvalidCredentialsErrorFilter } from './shared/infrastructure/exception-filters/invalid-credentials-error.filter';
 import {
   ClassSerializerInterceptor,
   INestApplication,
@@ -28,5 +29,6 @@ export function applyGlobalConfig(app: INestApplication) {
     new ConflictErrorFilter(),
     new NotFoundErrorFilter(),
     new InvalidPasswordErrorFilter(),
+    new InvalidCredentialsErrorFilter(),
   );
 }
