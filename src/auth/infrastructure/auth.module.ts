@@ -1,21 +1,19 @@
-import { SignOptions } from './../../../node_modules/@types/jsonwebtoken/index.d';
-
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { EnvConfigModule } from '@/shared/infrastructure/env-config/env-config.module';
 import { JwtModule } from '@nestjs/jwt';
+import { EnvConfigModule } from '@/shared/infrastructure/env-config/env-config.module';
 import { EnvConfigService } from '@/shared/infrastructure/env-config/env-config.service';
 
 @Module({
   imports: [
-    EnvConfigModule,
+    EnvConfigModule.forRoot(),
     JwtModule.registerAsync({
-      imports: [EnvConfigModule],
+      imports: [EnvConfigModule.forRoot()],
       inject: [EnvConfigService],
       useFactory: async (configService: EnvConfigService) => ({
         global: true,
         secret: configService.getJwtSecret(),
-        SignOptions: configService.getJwtExpiresInSeconds(),
+        signOptions: { expiresIn: configService.getJwtExpiresInSeconds() },
       }),
     }),
   ],
