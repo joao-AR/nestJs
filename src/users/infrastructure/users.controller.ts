@@ -71,6 +71,7 @@ export class UsersController {
     return UsersController.userToResponse(output);
   }
 
+  @HttpCode(200)
   @Post('login')
   async login(@Body() signinDto: SigninDto) {
     const output = await this.signinUseCase.execute(signinDto);
