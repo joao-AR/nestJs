@@ -7,30 +7,40 @@ import { DeleteUserUseCase } from '../../deleteUser.usecase';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('DeleteUserUseCase integration tests', () => {
-  const prismaService = new PrismaClient();
-
   let sut: DeleteUserUseCase.UseCase;
-  let repository: UserPrismaRepository;
+  let prismaService: PrismaService;
   let module: TestingModule;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(prismaService)],
+      imports: [DatabaseModule.forTest(new PrismaClient())],
+      providers: [
+        {
+          provide: UserPrismaRepository,
+          useFactory: (prismaService: PrismaService) => {
+            return new UserPrismaRepository(prismaService);
+          },
+          inject: [PrismaService],
+        },
+        {
+          provide: DeleteUserUseCase.UseCase,
+          useFactory: (userRepository: UserPrismaRepository) =>
+            new DeleteUserUseCase.UseCase(userRepository),
+          inject: [UserPrismaRepository],
+        },
+      ],
     }).compile();
 
-    repository = new UserPrismaRepository(prismaService as any);
+    prismaService = module.get<PrismaService>(PrismaService);
+    sut = module.get<DeleteUserUseCase.UseCase>(DeleteUserUseCase.UseCase);
   });
 
   beforeEach(async () => {
-    sut = new DeleteUserUseCase.UseCase(repository);
     await prismaService.user.deleteMany();
-  });
-
-  afterAll(async () => {
-    await module.close();
   });
 
   it('Should throw error when entity not found', async () => {
