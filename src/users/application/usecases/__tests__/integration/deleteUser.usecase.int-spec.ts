@@ -2,7 +2,6 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { UserPrismaRepository } from '@/users/infrastructure/databases/prisma/repositories/user-prisma.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 import { DeleteUserUseCase } from '../../deleteUser.usecase';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
@@ -17,7 +16,7 @@ describe('DeleteUserUseCase integration tests', () => {
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(new PrismaClient())],
+      imports: [DatabaseModule],
       providers: [
         {
           provide: UserPrismaRepository,

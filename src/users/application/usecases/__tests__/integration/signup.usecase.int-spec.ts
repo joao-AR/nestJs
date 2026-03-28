@@ -2,27 +2,36 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { UserPrismaRepository } from '@/users/infrastructure/databases/prisma/repositories/user-prisma.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 import { SignUpUseCase } from '../../signup.usecase';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-provider/bcryptjs-hash.provider';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('SignUpUseCase integration tests', () => {
-  const prismaService = new PrismaClient();
-
   let sut: SignUpUseCase.UseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
   let hashProvider: HashProvider;
+  let prismaService: PrismaService;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(prismaService)],
+      imports: [DatabaseModule],
+      providers: [
+        {
+          provide: UserPrismaRepository,
+          useFactory: (prismaService: PrismaService) => {
+            return new UserPrismaRepository(prismaService);
+          },
+          inject: [PrismaService],
+        },
+      ],
     }).compile();
 
-    repository = new UserPrismaRepository(prismaService as any);
+    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
     hashProvider = new BcryptjsHashProvider();
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   beforeEach(async () => {

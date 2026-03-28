@@ -2,26 +2,35 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { UserPrismaRepository } from '@/users/infrastructure/databases/prisma/repositories/user-prisma.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { UpdateUserUseCase } from '../../updateUserName.usecase';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('UpdateUserUseCase integration tests', () => {
-  const prismaService = new PrismaClient();
-
   let sut: UpdateUserUseCase.UseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
+  let prismaService: PrismaService;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(prismaService)],
+      imports: [DatabaseModule],
+      providers: [
+        {
+          provide: UserPrismaRepository,
+          useFactory: (prismaService: PrismaService) => {
+            return new UserPrismaRepository(prismaService);
+          },
+          inject: [PrismaService],
+        },
+      ],
     }).compile();
 
-    repository = new UserPrismaRepository(prismaService as any);
+    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   beforeEach(async () => {
