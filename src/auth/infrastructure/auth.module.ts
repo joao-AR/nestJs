@@ -10,7 +10,7 @@ import { EnvConfigService } from '@/shared/infrastructure/env-config/env-config.
     JwtModule.registerAsync({
       imports: [EnvConfigModule.forRoot()],
       inject: [EnvConfigService],
-      useFactory: async (configService: EnvConfigService) => ({
+      useFactory: (configService: EnvConfigService) => ({
         global: true,
         secret: configService.getJwtSecret(),
         signOptions: { expiresIn: configService.getJwtExpiresInSeconds() },
