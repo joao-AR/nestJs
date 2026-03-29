@@ -48,8 +48,8 @@ export class UsersController {
   @Inject(DeleteUserUseCase)
   private deleteUserUseCase: DeleteUserUseCase;
 
-  @Inject(GetUserUseCase.UseCase)
-  private getUserUseCase: GetUserUseCase.UseCase;
+  @Inject(GetUserUseCase)
+  private getUserUseCase: GetUserUseCase;
 
   @Inject(ListUsersUseCase.UseCase)
   private listUsersUseCase: ListUsersUseCase.UseCase;

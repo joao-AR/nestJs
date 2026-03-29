@@ -9,7 +9,7 @@ import { GetUserUseCase } from '../../getUser.usecase';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('GetUserUseCase integration tests', () => {
-  let sut: GetUserUseCase.UseCase;
+  let sut: GetUserUseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
   let prismaService: PrismaService;
@@ -34,7 +34,7 @@ describe('GetUserUseCase integration tests', () => {
   });
 
   beforeEach(async () => {
-    sut = new GetUserUseCase.UseCase(repository);
+    sut = new GetUserUseCase(repository);
     await prismaService.user.deleteMany();
   });
 

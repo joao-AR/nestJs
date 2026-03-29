@@ -2,19 +2,19 @@ import { UserRepository } from '@/users/domain/repositories/user.repository';
 import { UserOutputDto, UserOutPutMapper } from '../dto/user-output';
 import { UseCase as defaultUseCase } from '@/shared/application/usecases/use-case';
 
-export namespace GetUserUseCase {
-  export type Input = {
-    id: string;
-  };
+export type GetUserInput = {
+  id: string;
+};
 
-  export type Output = UserOutputDto;
+export type GetUserOutput = UserOutputDto;
 
-  export class UseCase implements defaultUseCase<Input, Output> {
-    constructor(private userRepository: UserRepository.Repository) {}
+export class GetUserUseCase
+  implements defaultUseCase<GetUserInput, GetUserOutput>
+{
+  constructor(private userRepository: UserRepository) {}
 
-    async execute(input: Input): Promise<Output> {
-      const entity = await this.userRepository.findById(input.id);
-      return UserOutPutMapper.toOutput(entity);
-    }
+  async execute(input: GetUserInput): Promise<GetUserOutput> {
+    const entity = await this.userRepository.findById(input.id);
+    return UserOutPutMapper.toOutput(entity);
   }
 }
