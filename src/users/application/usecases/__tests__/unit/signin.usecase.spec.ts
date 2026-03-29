@@ -9,14 +9,14 @@ import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { InvalidCredentialsError } from '@/shared/application/errors/invalid-credentials-error';
 
 describe('SignInUseCase unit tests', () => {
-  let sut: SignInUseCase.UseCase;
+  let sut: SignInUseCase;
   let repository: UserInMemoryRepository;
   let hashProvider: HashProvider;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
     hashProvider = new BcryptjsHashProvider();
-    sut = new SignInUseCase.UseCase(repository, hashProvider);
+    sut = new SignInUseCase(repository, hashProvider);
   });
 
   it('Should authenticate a user', async () => {

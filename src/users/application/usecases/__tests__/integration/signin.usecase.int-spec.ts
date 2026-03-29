@@ -13,7 +13,7 @@ import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('SignInUseCase integration tests', () => {
-  let sut: SignInUseCase.UseCase;
+  let sut: SignInUseCase;
   let repository: UserPrismaRepository;
   let hashProvider: HashProvider;
   let module: TestingModule;
@@ -40,7 +40,7 @@ describe('SignInUseCase integration tests', () => {
   });
 
   beforeEach(async () => {
-    sut = new SignInUseCase.UseCase(repository, hashProvider);
+    sut = new SignInUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 

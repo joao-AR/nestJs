@@ -36,8 +36,8 @@ import { AuthService } from '@/auth/infrastructure/auth.service';
 
 @Controller('users')
 export class UsersController {
-  @Inject(SignUpUseCase.UseCase)
-  private signupUseCase: SignUpUseCase.UseCase;
+  @Inject(SignUpUseCase)
+  private signupUseCase: SignUpUseCase;
 
   @Inject(SignInUseCase.UseCase)
   private signinUseCase: SignInUseCase.UseCase;

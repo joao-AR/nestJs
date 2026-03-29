@@ -5,36 +5,36 @@ import { UserOutputDto, UserOutPutMapper } from '../dto/user-output';
 import { UseCase as DefaultUseCase } from '@/shared/application/usecases/use-case';
 import { InvalidCredentialsError } from '@/shared/application/errors/invalid-credentials-error';
 
-export namespace SignInUseCase {
-  export type Input = {
-    email: string;
-    password: string;
-  };
+export type SignInInput = {
+  email: string;
+  password: string;
+};
 
-  export type Output = UserOutputDto;
+export type SignInOutput = UserOutputDto;
 
-  export class UseCase implements DefaultUseCase<Input, Output> {
-    constructor(
-      private userRepository: UserRepository.Repository,
-      private hashProvider: HashProvider,
-    ) {}
+export class SignInUseCase
+  implements DefaultUseCase<SignInInput, SignInOutput>
+{
+  constructor(
+    private userRepository: UserRepository,
+    private hashProvider: HashProvider,
+  ) {}
 
-    async execute(input: Input): Promise<Output> {
-      const { email, password } = input;
-      if (!email || !password) {
-        throw new BadRequestError('Input data not provided');
-      }
-
-      const entity = await this.userRepository.findByEmail(email);
-
-      const hashPasswordMatches = await this.hashProvider.compareHash(
-        password,
-        entity.password,
-      );
-      if (!hashPasswordMatches) {
-        throw new InvalidCredentialsError('Invalid credentials');
-      }
-      return UserOutPutMapper.toOutput(entity);
+  async execute(input: SignInInput): Promise<SignInOutput> {
+    const { email, password } = input;
+    if (!email || !password) {
+      throw new BadRequestError('Input data not provided');
     }
+
+    const entity = await this.userRepository.findByEmail(email);
+
+    const hashPasswordMatches = await this.hashProvider.compareHash(
+      password,
+      entity.password,
+    );
+    if (!hashPasswordMatches) {
+      throw new InvalidCredentialsError('Invalid credentials');
+    }
+    return UserOutPutMapper.toOutput(entity);
   }
 }
