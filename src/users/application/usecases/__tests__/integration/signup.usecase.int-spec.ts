@@ -8,7 +8,7 @@ import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-prov
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('SignUpUseCase integration tests', () => {
-  let sut: SignUpUseCase.UseCase;
+  let sut: SignUpUseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
   let hashProvider: HashProvider;
@@ -35,7 +35,7 @@ describe('SignUpUseCase integration tests', () => {
   });
 
   beforeEach(async () => {
-    sut = new SignUpUseCase.UseCase(repository, hashProvider);
+    sut = new SignUpUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 
