@@ -1,20 +1,20 @@
 import { UserInMemoryRepository } from '@/users/infrastructure/databases/in-memory/repositories/user-in-memory.repository';
 import { ListUsersUseCase } from '../../listUsers.usecase';
-import { UserRepository } from '@/users/domain/repositories/user.repository';
+import { UserSearchResult } from '@/users/domain/repositories/user.repository';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 
 describe('ListUser usecase unit tests', () => {
-  let sut: ListUsersUseCase.UseCase;
+  let sut: ListUsersUseCase;
   let repository: UserInMemoryRepository;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    sut = new ListUsersUseCase.UseCase(repository);
+    sut = new ListUsersUseCase(repository);
   });
 
   it('toOutPut Method', () => {
-    let result = new UserRepository.SearchResult({
+    let result = new UserSearchResult({
       items: [],
       total: 1,
       currentPage: 1,
@@ -34,9 +34,9 @@ describe('ListUser usecase unit tests', () => {
       perPage: 2,
     });
 
-    let entity = new UserEntity(userDataBuilder({}));
+    const entity = new UserEntity(userDataBuilder({}));
 
-    result = new UserRepository.SearchResult({
+    result = new UserSearchResult({
       items: [entity],
       total: 1,
       currentPage: 1,
@@ -78,7 +78,7 @@ describe('ListUser usecase unit tests', () => {
       perPage: 15,
     });
 
-    let entity = new UserEntity(userDataBuilder({}));
+    new UserEntity(userDataBuilder({}));
   });
 
   it('should return the users using pagination and, sort and filter', async () => {

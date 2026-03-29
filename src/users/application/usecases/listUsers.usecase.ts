@@ -1,4 +1,8 @@
-import { UserRepository } from '@/users/domain/repositories/user.repository';
+import {
+  UserRepository,
+  UserSearchParams,
+  UserSearchResult,
+} from '@/users/domain/repositories/user.repository';
 import { SearchInputDto } from '@/shared/application/dto/search-input';
 import { UseCase as DefaultUseCase } from '@/shared/application/usecases/use-case';
 import {
@@ -7,27 +11,27 @@ import {
 } from '@/shared/application/dto/pagination-output';
 import { UserOutputDto, UserOutPutMapper } from '../dto/user-output';
 
-export namespace ListUsersUseCase {
-  export type Input = SearchInputDto;
+export type ListUsersInput = SearchInputDto;
 
-  export type Output = PaginationOutputDto<UserOutputDto>;
+export type ListUsersOutput = PaginationOutputDto<UserOutputDto>;
 
-  export class UseCase implements DefaultUseCase<Input, Output> {
-    constructor(private userRepository: UserRepository.Repository) {}
+export class ListUsersUseCase
+  implements DefaultUseCase<ListUsersInput, ListUsersOutput>
+{
+  constructor(private userRepository: UserRepository) {}
 
-    async execute(input: Input): Promise<Output> {
-      const params = new UserRepository.SearchParams(input);
-      const searchResult = await this.userRepository.search(params);
+  async execute(input: ListUsersInput): Promise<ListUsersOutput> {
+    const params = new UserSearchParams(input);
+    const searchResult = await this.userRepository.search(params);
 
-      return this.toOutput(searchResult);
-    }
+    return this.toOutput(searchResult);
+  }
 
-    private toOutput(searchResult: UserRepository.SearchResult): Output {
-      const items = searchResult.items.map(item =>
-        UserOutPutMapper.toOutput(item),
-      );
+  private toOutput(searchResult: UserSearchResult): ListUsersOutput {
+    const items = searchResult.items.map(item =>
+      UserOutPutMapper.toOutput(item),
+    );
 
-      return paginationOutputMapper.toOutput(items, searchResult);
-    }
+    return paginationOutputMapper.toOutput(items, searchResult);
   }
 }

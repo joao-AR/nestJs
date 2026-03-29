@@ -20,7 +20,10 @@ import { UpdateUserUseCase } from '../application/usecases/updateUserName.usecas
 import { DeleteUserUseCase } from '../application/usecases/deleteUser.usecase';
 import { GetUserUseCase } from '../application/usecases/getUser.usecase';
 import { UpdateUserPasswordUseCase } from '../application/usecases/updateUserPassword.usecase';
-import { ListUsersUseCase } from '../application/usecases/listUsers.usecase';
+import {
+  ListUsersUseCase,
+  ListUsersOutput,
+} from '../application/usecases/listUsers.usecase';
 import { SigninDto } from './dto/signin-user.dto';
 import { ListUsersDto } from './dto/list-users.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
