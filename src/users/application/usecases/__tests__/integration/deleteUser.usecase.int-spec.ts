@@ -9,7 +9,7 @@ import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builde
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('DeleteUserUseCase integration tests', () => {
-  let sut: DeleteUserUseCase.UseCase;
+  let sut: DeleteUserUseCase;
   let prismaService: PrismaService;
   let module: TestingModule;
 
@@ -26,16 +26,16 @@ describe('DeleteUserUseCase integration tests', () => {
           inject: [PrismaService],
         },
         {
-          provide: DeleteUserUseCase.UseCase,
+          provide: DeleteUserUseCase,
           useFactory: (userRepository: UserPrismaRepository) =>
-            new DeleteUserUseCase.UseCase(userRepository),
+            new DeleteUserUseCase(userRepository),
           inject: [UserPrismaRepository],
         },
       ],
     }).compile();
 
     prismaService = module.get<PrismaService>(PrismaService);
-    sut = module.get<DeleteUserUseCase.UseCase>(DeleteUserUseCase.UseCase);
+    sut = module.get<DeleteUserUseCase>(DeleteUserUseCase);
   });
 
   beforeEach(async () => {
