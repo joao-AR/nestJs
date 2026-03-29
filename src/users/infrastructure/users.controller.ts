@@ -54,8 +54,8 @@ export class UsersController {
   @Inject(GetUserUseCase)
   private getUserUseCase: GetUserUseCase;
 
-  @Inject(ListUsersUseCase.UseCase)
-  private listUsersUseCase: ListUsersUseCase.UseCase;
+  @Inject(ListUsersUseCase)
+  private listUsersUseCase: ListUsersUseCase;
 
   @Inject(AuthService)
   private authService: AuthService;
