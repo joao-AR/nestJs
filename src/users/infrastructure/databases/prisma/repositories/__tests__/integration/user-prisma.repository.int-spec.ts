@@ -5,7 +5,10 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
-import { UserRepository } from '@/users/domain/repositories/user.repository';
+import {
+  UserSearchParams,
+  UserSearchResult,
+} from '@/users/domain/repositories/user.repository';
 import { ConflictError } from '@/shared/domain/errors/conflict-error';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 import { UsersModule } from '@/users/infrastructure/users.module';
@@ -169,10 +172,10 @@ describe('UserPrismaRepository integration tests', () => {
         data: entities.map(item => item.toJson()),
       });
 
-      const searchOutput = await sut.search(new UserRepository.SearchParams());
+      const searchOutput = await sut.search(new UserSearchParams());
 
       const itens = searchOutput.items;
-      expect(searchOutput).toBeInstanceOf(UserRepository.SearchResult);
+      expect(searchOutput).toBeInstanceOf(UserSearchResult);
       expect(searchOutput.total).toBe(16);
       expect(searchOutput.items.length).toBe(15);
       searchOutput.items.forEach(item =>
@@ -203,7 +206,7 @@ describe('UserPrismaRepository integration tests', () => {
       });
 
       const searchOutputPage1 = await sut.search(
-        new UserRepository.SearchParams({
+        new UserSearchParams({
           page: 1,
           perPage: 2,
           sort: 'name',
@@ -220,7 +223,7 @@ describe('UserPrismaRepository integration tests', () => {
       );
 
       const searchOutputPage2 = await sut.search(
-        new UserRepository.SearchParams({
+        new UserSearchParams({
           page: 2,
           perPage: 2,
           sort: 'name',
