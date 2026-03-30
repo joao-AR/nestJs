@@ -6,7 +6,6 @@ import {
   HttpCode,
   Inject,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -95,10 +94,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const output = await this.updateUserUseCase.execute({
       id,
       ...updateUserDto,
