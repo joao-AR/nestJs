@@ -64,7 +64,7 @@ export class UsersController {
     return new UserPresenter(output);
   }
 
-  static listUsersToResponse(output: ListUsersUseCase.Output) {
+  static listUsersToResponse(output: ListUsersOutput) {
     return new UserCollectionPresenter(output);
   }
 
