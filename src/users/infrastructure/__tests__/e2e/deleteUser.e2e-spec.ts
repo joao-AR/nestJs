@@ -14,7 +14,7 @@ import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.se
 describe('UserController DELETE e2e tests', () => {
   let app: INestApplication;
   let module: TestingModule;
-  let repository: UserRepository.Repository;
+  let repository: UserRepository;
   let prismaService: PrismaService;
 
   let entity: UserEntity;
@@ -28,7 +28,7 @@ describe('UserController DELETE e2e tests', () => {
     applyGlobalConfig(app);
     await app.init();
 
-    repository = module.get<UserRepository.Repository>('UserRepository');
+    repository = module.get<UserRepository>('UserRepository');
     prismaService = module.get<PrismaService>(PrismaService);
   });
 

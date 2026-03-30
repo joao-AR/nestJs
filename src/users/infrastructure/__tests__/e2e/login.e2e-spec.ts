@@ -16,7 +16,7 @@ import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.se
 describe('UserController POST login e2e tests', () => {
   let app: INestApplication;
   let module: TestingModule;
-  let repository: UserRepository.Repository;
+  let repository: UserRepository;
   let hashProvider: HashProvider;
   let signinDto: SigninDto;
   let prismaService: PrismaService;
@@ -31,7 +31,7 @@ describe('UserController POST login e2e tests', () => {
     applyGlobalConfig(app);
     await app.init();
 
-    repository = module.get<UserRepository.Repository>('UserRepository');
+    repository = module.get<UserRepository>('UserRepository');
     hashProvider = module.get<HashProvider>('hashProvider');
     prismaService = module.get<PrismaService>(PrismaService);
   });
