@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  Inject,
   Param,
   Patch,
   Post,
@@ -35,29 +34,16 @@ import { AuthService } from '@/auth/infrastructure/auth.service';
 
 @Controller('users')
 export class UsersController {
-  @Inject(SignUpUseCase)
-  private signupUseCase: SignUpUseCase;
-
-  @Inject(SignInUseCase)
-  private signinUseCase: SignInUseCase;
-
-  @Inject(UpdateUserUseCase)
-  private updateUserUseCase: UpdateUserUseCase;
-
-  @Inject(UpdateUserPasswordUseCase)
-  private updateUserPasswordUseCase: UpdateUserPasswordUseCase;
-
-  @Inject(DeleteUserUseCase)
-  private deleteUserUseCase: DeleteUserUseCase;
-
-  @Inject(GetUserUseCase)
-  private getUserUseCase: GetUserUseCase;
-
-  @Inject(ListUsersUseCase)
-  private listUsersUseCase: ListUsersUseCase;
-
-  @Inject(AuthService)
-  private authService: AuthService;
+  constructor(
+    private signupUseCase: SignUpUseCase,
+    private signinUseCase: SignInUseCase,
+    private updateUserUseCase: UpdateUserUseCase,
+    private updateUserPasswordUseCase: UpdateUserPasswordUseCase,
+    private deleteUserUseCase: DeleteUserUseCase,
+    private getUserUseCase: GetUserUseCase,
+    private listUsersUseCase: ListUsersUseCase,
+    private authService: AuthService,
+  ) {}
 
   static userToResponse(output: UserOutputDto) {
     return new UserPresenter(output);
