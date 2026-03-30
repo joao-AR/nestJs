@@ -1,8 +1,8 @@
 import { SortDirection } from '@/shared/domain/repositories/searchable-repository-contracts';
-import { ListUsersUseCase } from '@/users/application/usecases/listUsers.usecase';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { ListUsersInput } from '@/users/application/usecases/listUsers.usecase';
+import { IsOptional, IsString } from 'class-validator';
 
-export class ListUsersDto implements ListUsersUseCase.Input {
+export class ListUsersDto implements ListUsersInput {
   @IsOptional()
   page?: number;
 
