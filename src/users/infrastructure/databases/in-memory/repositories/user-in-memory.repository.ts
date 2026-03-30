@@ -1,4 +1,7 @@
-import { UserRepository } from '@/users/domain/repositories/user.repository';
+import {
+  UserRepository,
+  UserFilter,
+} from '@/users/domain/repositories/user.repository';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { ConflictError } from '@/shared/domain/errors/conflict-error';
@@ -7,7 +10,7 @@ import { SortDirection } from '@/shared/domain/repositories/searchable-repositor
 
 export class UserInMemoryRepository
   extends InMemorySearchableRepository<UserEntity>
-  implements UserRepository.Repository
+  implements UserRepository
 {
   sortableFields: string[] = ['name', 'createdAt'];
 
@@ -28,7 +31,7 @@ export class UserInMemoryRepository
 
   protected async applyFilter(
     items: UserEntity[],
-    filter: UserRepository.Filter | null,
+    filter: UserFilter | null,
   ): Promise<UserEntity[]> {
     if (!filter) {
       return items;

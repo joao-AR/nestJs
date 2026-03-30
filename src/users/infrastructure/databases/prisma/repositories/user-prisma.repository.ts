@@ -2,11 +2,14 @@ import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { PrismaService } from './../../../../../shared/infrastructure/database/prisma/prisma.service';
 import { SearchParams } from '@/shared/domain/repositories/searchable-repository-contracts';
 import { UserEntity } from '@/users/domain/entities/user.entity';
-import { UserRepository } from '@/users/domain/repositories/user.repository';
+import {
+  UserRepository,
+  UserSearchResult,
+} from '@/users/domain/repositories/user.repository';
 import { UserModelMapper } from '../models/user-module.mapper';
 import { ConflictError } from '@/shared/domain/errors/conflict-error';
 
-export class UserPrismaRepository implements UserRepository.Repository {
+export class UserPrismaRepository implements UserRepository {
   constructor(private prismaService: PrismaService) {}
 
   async findByEmail(email: string): Promise<UserEntity> {
@@ -31,9 +34,7 @@ export class UserPrismaRepository implements UserRepository.Repository {
 
   sortableFields: string[] = ['name', 'createdAt'];
 
-  async search(
-    props: SearchParams<string>,
-  ): Promise<UserRepository.SearchResult> {
+  async search(props: SearchParams<string>): Promise<UserSearchResult> {
     const sortable = this.sortableFields?.includes(props.sort) || false;
     const orderByField = sortable ? props.sort : 'createdAt';
     const orderByDir = sortable ? props.sortDir : 'desc';
@@ -65,7 +66,7 @@ export class UserPrismaRepository implements UserRepository.Repository {
       take: props.perPage && props.perPage > 0 ? props.perPage : 15,
     });
 
-    return new UserRepository.SearchResult({
+    return new UserSearchResult({
       items: models.map(model => UserModelMapper.toEntity(model)),
       total: count,
       currentPage: props.page,
