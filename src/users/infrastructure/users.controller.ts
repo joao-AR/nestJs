@@ -42,8 +42,8 @@ export class UsersController {
   @Inject(SignInUseCase)
   private signinUseCase: SignInUseCase;
 
-  @Inject(UpdateUserUseCase.UseCase)
-  private updateUserUseCase: UpdateUserUseCase.UseCase;
+  @Inject(UpdateUserUseCase)
+  private updateUserUseCase: UpdateUserUseCase;
 
   @Inject(UpdateUserPasswordUseCase.UseCase)
   private updateUserPasswordUseCase: UpdateUserPasswordUseCase.UseCase;

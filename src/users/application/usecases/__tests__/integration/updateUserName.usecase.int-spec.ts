@@ -9,7 +9,7 @@ import { UpdateUserUseCase } from '../../updateUserName.usecase';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('UpdateUserUseCase integration tests', () => {
-  let sut: UpdateUserUseCase.UseCase;
+  let sut: UpdateUserUseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
   let prismaService: PrismaService;
@@ -34,7 +34,7 @@ describe('UpdateUserUseCase integration tests', () => {
   });
 
   beforeEach(async () => {
-    sut = new UpdateUserUseCase.UseCase(repository);
+    sut = new UpdateUserUseCase(repository);
     await prismaService.user.deleteMany();
   });
 
