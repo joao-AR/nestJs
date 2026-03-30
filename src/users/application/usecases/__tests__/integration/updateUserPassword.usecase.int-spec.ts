@@ -13,7 +13,7 @@ import { InvalidPasswordError } from '@/shared/application/errors/invalid-passwo
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('UpdateUserPasswordUseCase integration tests', () => {
-  let sut: UpdateUserPasswordUseCase.UseCase;
+  let sut: UpdateUserPasswordUseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
   let hashProvider: HashProvider;
@@ -40,7 +40,7 @@ describe('UpdateUserPasswordUseCase integration tests', () => {
   });
 
   beforeEach(async () => {
-    sut = new UpdateUserPasswordUseCase.UseCase(repository, hashProvider);
+    sut = new UpdateUserPasswordUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 

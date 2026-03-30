@@ -8,14 +8,14 @@ import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-prov
 import { InvalidPasswordError } from '@/shared/application/errors/invalid-password-error';
 
 describe('UpdateUserPasswordUseCase unit tests', () => {
-  let sut: UpdateUserPasswordUseCase.UseCase;
+  let sut: UpdateUserPasswordUseCase;
   let repository: UserInMemoryRepository;
   let hashProvider: HashProvider;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
     hashProvider = new BcryptjsHashProvider();
-    sut = new UpdateUserPasswordUseCase.UseCase(repository, hashProvider);
+    sut = new UpdateUserPasswordUseCase(repository, hashProvider);
   });
 
   it('Should throw a error when entity not found update a user', async () => {

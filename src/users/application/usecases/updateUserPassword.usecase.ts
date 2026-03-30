@@ -6,43 +6,45 @@ import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 import { InvalidPasswordError } from '@/shared/application/errors/invalid-password-error';
 import { password } from '@inquirer/prompts';
 
-export namespace UpdateUserPasswordUseCase {
-  export type Input = {
-    id: string;
-    password: string;
-    oldPassword: string;
-  };
+export type UpdateUserPasswordInput = {
+  id: string;
+  password: string;
+  oldPassword: string;
+};
 
-  export type Output = UserOutputDto;
+export type UpdateUserPasswordOutput = UserOutputDto;
 
-  export class UseCase implements DefaultUseCase<Input, Output> {
-    constructor(
-      private userRepository: UserRepository.Repository,
-      private hashProvider: HashProvider,
-    ) {}
+export class UpdateUserPasswordUseCase
+  implements DefaultUseCase<UpdateUserPasswordInput, UpdateUserPasswordOutput>
+{
+  constructor(
+    private userRepository: UserRepository,
+    private hashProvider: HashProvider,
+  ) {}
 
-    async execute(input: Input): Promise<Output> {
-      const entity = await this.userRepository.findById(input.id);
-      if (!input.password || !input.oldPassword) {
-        throw new InvalidPasswordError(
-          'Old password and new password is required',
-        );
-      }
-
-      const checkOldPassword = await this.hashProvider.compareHash(
-        input.oldPassword,
-        entity.password,
+  async execute(
+    input: UpdateUserPasswordInput,
+  ): Promise<UpdateUserPasswordOutput> {
+    const entity = await this.userRepository.findById(input.id);
+    if (!input.password || !input.oldPassword) {
+      throw new InvalidPasswordError(
+        'Old password and new password is required',
       );
-
-      if (!checkOldPassword) {
-        throw new InvalidPasswordError('Old password does not match');
-      }
-
-      const hashPassword = await this.hashProvider.generateHash(input.password);
-      entity.updatePassword(hashPassword);
-
-      await this.userRepository.update(entity);
-      return UserOutPutMapper.toOutput(entity);
     }
+
+    const checkOldPassword = await this.hashProvider.compareHash(
+      input.oldPassword,
+      entity.password,
+    );
+
+    if (!checkOldPassword) {
+      throw new InvalidPasswordError('Old password does not match');
+    }
+
+    const hashPassword = await this.hashProvider.generateHash(input.password);
+    entity.updatePassword(hashPassword);
+
+    await this.userRepository.update(entity);
+    return UserOutPutMapper.toOutput(entity);
   }
 }
