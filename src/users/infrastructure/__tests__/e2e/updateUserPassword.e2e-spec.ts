@@ -3,45 +3,39 @@ import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testin
 import { UserRepository } from '@/users/domain/repositories/user.repository';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 import { EnvConfigModule } from '@/shared/infrastructure/env-config/env-config.module';
 import { UsersModule } from '../../users.module';
 import { DatabaseModule } from '@/shared/infrastructure/database/database.module';
 import request from 'supertest';
-import { UsersController } from '../../users.controller';
-import { instanceToPlain } from 'class-transformer';
 import { applyGlobalConfig } from '@/global-config';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
-import { BcryptjsHashProvider } from '../../providers/hash-provider/bcryptjs-hash.provider';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('UserController PATCH e2e tests', () => {
   let app: INestApplication;
   let module: TestingModule;
-  let repository: UserRepository.Repository;
+  let repository: UserRepository;
   let updatePasswordDto: UpdatePasswordDto;
 
-  const prismaService = new PrismaClient();
+  let prismaService: PrismaService;
   let hashProvider: HashProvider;
   let entity: UserEntity;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [
-        EnvConfigModule,
-        UsersModule,
-        DatabaseModule.forTest(prismaService),
-      ],
+      imports: [EnvConfigModule, UsersModule, DatabaseModule],
     }).compile();
 
     app = module.createNestApplication();
     applyGlobalConfig(app);
     await app.init();
 
-    repository = module.get<UserRepository.Repository>('UserRepository');
-    hashProvider = new BcryptjsHashProvider();
+    repository = module.get<UserRepository>('UserRepository');
+    prismaService = module.get<PrismaService>(PrismaService);
+    hashProvider = module.get<HashProvider>('hashProvider');
   });
 
   beforeEach(async () => {
@@ -58,7 +52,7 @@ describe('UserController PATCH e2e tests', () => {
 
   describe('PATCH /users/:id', () => {
     it('Should update a user password', async () => {
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/users/${entity._id}`)
         .send(updatePasswordDto)
         .expect(200);
@@ -89,7 +83,7 @@ describe('UserController PATCH e2e tests', () => {
     });
 
     it('Should return error with 404 code when id is invalid', async () => {
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch('/users/fakeId')
         .send(updatePasswordDto)
         .expect(404)
@@ -130,7 +124,7 @@ describe('UserController PATCH e2e tests', () => {
 
     it('Should return error with 422 code when password does not match ', async () => {
       updatePasswordDto.oldPassword = 'fakePass';
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(`/users/${entity._id}`)
         .send(updatePasswordDto)
         .expect(422)

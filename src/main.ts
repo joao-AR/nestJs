@@ -1,10 +1,9 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor } from '@nestjs/common';
 import { applyGlobalConfig } from './global-config';
 
 async function bootstrap() {

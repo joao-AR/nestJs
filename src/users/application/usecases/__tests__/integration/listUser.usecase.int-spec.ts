@@ -2,30 +2,38 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { UserPrismaRepository } from '@/users/infrastructure/databases/prisma/repositories/user-prisma.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
-import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { ListUsersUseCase } from '../../listUsers.usecase';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('ListUsersUseCase integration tests', () => {
-  const prismaService = new PrismaClient();
-
-  let sut: ListUsersUseCase.UseCase;
+  let sut: ListUsersUseCase;
   let repository: UserPrismaRepository;
   let module: TestingModule;
+  let prismaService: PrismaService;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(prismaService)],
+      imports: [DatabaseModule],
+      providers: [
+        {
+          provide: UserPrismaRepository,
+          useFactory: (prismaService: PrismaService) => {
+            return new UserPrismaRepository(prismaService);
+          },
+          inject: [PrismaService],
+        },
+      ],
     }).compile();
 
-    repository = new UserPrismaRepository(prismaService as any);
+    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   beforeEach(async () => {
-    sut = new ListUsersUseCase.UseCase(repository);
+    sut = new ListUsersUseCase(repository);
     await prismaService.user.deleteMany();
   });
 

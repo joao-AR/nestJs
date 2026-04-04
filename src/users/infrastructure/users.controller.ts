@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  Inject,
   Param,
   Patch,
   Post,
@@ -19,7 +18,10 @@ import { UpdateUserUseCase } from '../application/usecases/updateUserName.usecas
 import { DeleteUserUseCase } from '../application/usecases/deleteUser.usecase';
 import { GetUserUseCase } from '../application/usecases/getUser.usecase';
 import { UpdateUserPasswordUseCase } from '../application/usecases/updateUserPassword.usecase';
-import { ListUsersUseCase } from '../application/usecases/listUsers.usecase';
+import {
+  ListUsersUseCase,
+  ListUsersOutput,
+} from '../application/usecases/listUsers.usecase';
 import { SigninDto } from './dto/signin-user.dto';
 import { ListUsersDto } from './dto/list-users.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -32,35 +34,22 @@ import { AuthService } from '@/auth/infrastructure/auth.service';
 
 @Controller('users')
 export class UsersController {
-  @Inject(SignUpUseCase.UseCase)
-  private signupUseCase: SignUpUseCase.UseCase;
-
-  @Inject(SignInUseCase.UseCase)
-  private signinUseCase: SignInUseCase.UseCase;
-
-  @Inject(UpdateUserUseCase.UseCase)
-  private updateUserUseCase: UpdateUserUseCase.UseCase;
-
-  @Inject(UpdateUserPasswordUseCase.UseCase)
-  private updateUserPasswordUseCase: UpdateUserPasswordUseCase.UseCase;
-
-  @Inject(DeleteUserUseCase.UseCase)
-  private deleteUserUseCase: DeleteUserUseCase.UseCase;
-
-  @Inject(GetUserUseCase.UseCase)
-  private getUserUseCase: GetUserUseCase.UseCase;
-
-  @Inject(ListUsersUseCase.UseCase)
-  private listUsersUseCase: ListUsersUseCase.UseCase;
-
-  @Inject(AuthService)
-  private authService: AuthService;
+  constructor(
+    private signupUseCase: SignUpUseCase,
+    private signinUseCase: SignInUseCase,
+    private updateUserUseCase: UpdateUserUseCase,
+    private updateUserPasswordUseCase: UpdateUserPasswordUseCase,
+    private deleteUserUseCase: DeleteUserUseCase,
+    private getUserUseCase: GetUserUseCase,
+    private listUsersUseCase: ListUsersUseCase,
+    private authService: AuthService,
+  ) {}
 
   static userToResponse(output: UserOutputDto) {
     return new UserPresenter(output);
   }
 
-  static listUsersToResponse(output: ListUsersUseCase.Output) {
+  static listUsersToResponse(output: ListUsersOutput) {
     return new UserCollectionPresenter(output);
   }
 

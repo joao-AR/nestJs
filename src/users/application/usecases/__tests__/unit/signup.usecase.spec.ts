@@ -7,14 +7,14 @@ import { ConflictError } from '@/shared/domain/errors/conflict-error';
 import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 
 describe('SignUpUseCase unit tests', () => {
-  let sut: SignUpUseCase.UseCase;
+  let sut: SignUpUseCase;
   let repository: UserInMemoryRepository;
   let hashProvider: HashProvider;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
     hashProvider = new BcryptjsHashProvider();
-    sut = new SignUpUseCase.UseCase(repository, hashProvider);
+    sut = new SignUpUseCase(repository, hashProvider);
   });
 
   it('Should create a user', async () => {

@@ -1,18 +1,18 @@
-import { UserRepository } from '@/users/domain/repositories/user.repository';;
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 import { UseCase as defaultUseCase } from '@/shared/application/usecases/use-case';
 
-export namespace DeleteUserUseCase {
-  export type Input = {
-    id: string;
-  };
+export type DeleteUserInput = {
+  id: string;
+};
 
-  export type Output = void;
+export type DeleteUserOutput = void;
 
-  export class UseCase implements defaultUseCase<Input, Output> {
-    constructor(private userRepository: UserRepository.Repository) {}
+export class DeleteUserUseCase
+  implements defaultUseCase<DeleteUserInput, DeleteUserOutput>
+{
+  constructor(private userRepository: UserRepository) {}
 
-    async execute(input: Input): Promise<Output> {
-      const entity = await this.userRepository.delete(input.id);
-    }
+  async execute(input: DeleteUserInput): Promise<DeleteUserOutput> {
+    await this.userRepository.delete(input.id);
   }
 }

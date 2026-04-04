@@ -1,16 +1,14 @@
-import { password } from '@inquirer/prompts';
 import { UserOutputDto } from './../../../application/dto/user-output';
 import { UsersController } from '../../users.controller';
-import { SignUpUseCase } from '@/users/application/usecases/signup.usecase';
+import { SignUpOutput } from '@/users/application/usecases/signup.usecase';
 import { SignupDto } from '../../dto/signup-user.dto';
-import { SignInUseCase } from '@/users/application/usecases/signin.usecase';
 import { SigninDto } from '../../dto/signin-user.dto';
-import { UpdateUserUseCase } from '@/users/application/usecases/updateUserName.usecase';
+import { UpdateUserNameOutput } from '@/users/application/usecases/updateUserName.usecase';
 import { UpdateUserDto } from '../../dto/update-user.dto';
-import { UpdateUserPasswordUseCase } from '@/users/application/usecases/updateUserPassword.usecase';
+import { UpdateUserPasswordOutput } from '@/users/application/usecases/updateUserPassword.usecase';
 import { UpdatePasswordDto } from '../../dto/update-password.dto';
-import { GetUserUseCase } from '@/users/application/usecases/getUser.usecase';
-import { ListUsersUseCase } from '@/users/application/usecases/listUsers.usecase';
+import { GetUserOutput } from '@/users/application/usecases/getUser.usecase';
+import { ListUsersOutput } from '@/users/application/usecases/listUsers.usecase';
 import {
   UserCollectionPresenter,
   UserPresenter,
@@ -38,7 +36,7 @@ describe('UsersController', () => {
   });
 
   it('Should create a user', async () => {
-    const output: SignUpUseCase.Output = props;
+    const output: SignUpOutput = props;
 
     const mockSignupUseCase = {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
@@ -83,7 +81,7 @@ describe('UsersController', () => {
   });
 
   it('Should update a user', async () => {
-    const output: UpdateUserUseCase.Output = props;
+    const output: UpdateUserNameOutput = props;
 
     const mockUpdateUserUseCase = {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
@@ -105,7 +103,7 @@ describe('UsersController', () => {
   });
 
   it('Should update the user password', async () => {
-    const output: UpdateUserPasswordUseCase.Output = props;
+    const output: UpdateUserPasswordOutput = props;
 
     const mockUpdateUserPasswordUseCase = {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
@@ -142,7 +140,7 @@ describe('UsersController', () => {
   });
 
   it('Should get an user', async () => {
-    const output: GetUserUseCase.Output = props;
+    const output: GetUserOutput = props;
 
     const mockGetUserUseCase = {
       execute: jest.fn().mockReturnValue(Promise.resolve(output)),
@@ -157,7 +155,7 @@ describe('UsersController', () => {
   });
 
   it('Should list users', async () => {
-    const output: ListUsersUseCase.Output = {
+    const output: ListUsersOutput = {
       items: [props],
       currentPage: 1,
       lastPage: 1,

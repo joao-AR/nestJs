@@ -6,12 +6,12 @@ import { UpdateUserUseCase } from '../../updateUserName.usecase';
 import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 
 describe('UpdateUserUseCase unit tests', () => {
-  let sut: UpdateUserUseCase.UseCase;
+  let sut: UpdateUserUseCase;
   let repository: UserInMemoryRepository;
 
   beforeEach(() => {
     repository = new UserInMemoryRepository();
-    sut = new UpdateUserUseCase.UseCase(repository);
+    sut = new UpdateUserUseCase(repository);
   });
 
   it('Should throw a error when entity not found update a user', async () => {

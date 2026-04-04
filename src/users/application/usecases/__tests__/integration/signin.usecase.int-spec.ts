@@ -2,7 +2,6 @@ import { DatabaseModule } from '@/shared/infrastructure/database/database.module
 import { setupPrismaTests } from '@/shared/infrastructure/database/prisma/testing/setup-prisma-tests';
 import { UserPrismaRepository } from '@/users/infrastructure/databases/prisma/repositories/user-prisma.repository';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
@@ -11,27 +10,37 @@ import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-provider/bcryptjs-hash.provider';
 import { InvalidCredentialsError } from '@/shared/application/errors/invalid-credentials-error';
 import { BadRequestError } from '@/shared/application/errors/bad-request-error';
+import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 
 describe('SignInUseCase integration tests', () => {
-  const prismaService = new PrismaClient();
-
-  let sut: SignInUseCase.UseCase;
+  let sut: SignInUseCase;
   let repository: UserPrismaRepository;
   let hashProvider: HashProvider;
   let module: TestingModule;
+  let prismaService: PrismaService;
 
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
-      imports: [DatabaseModule.forTest(prismaService)],
+      imports: [DatabaseModule],
+      providers: [
+        {
+          provide: UserPrismaRepository,
+          useFactory: (prismaService: PrismaService) => {
+            return new UserPrismaRepository(prismaService);
+          },
+          inject: [PrismaService],
+        },
+      ],
     }).compile();
 
-    repository = new UserPrismaRepository(prismaService as any);
+    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
     hashProvider = new BcryptjsHashProvider();
+    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   beforeEach(async () => {
-    sut = new SignInUseCase.UseCase(repository, hashProvider);
+    sut = new SignInUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 

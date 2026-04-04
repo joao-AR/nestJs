@@ -13,7 +13,6 @@ describe('ClassValidatorFields unit tests', () => {
   });
 
   it('Should validate with errors', () => {
-    // Validar se validateSync() foi chamado/executado na função declarada em class-validator-fields
     const spyValidateSync = jest.spyOn(libClassValidator, 'validateSync');
 
     spyValidateSync.mockReturnValue([
@@ -21,13 +20,13 @@ describe('ClassValidatorFields unit tests', () => {
         property: 'field',
         constraints: { isRequired: 'test error' },
       },
-    ]); // Simulando retorno que o Class validator retornaria
+    ]);
 
     const sut = new StubClassValidatorFields();
 
-    expect(sut.validate(null)).toBeFalsy(); // Espera-se que falidar null retorne falso
+    expect(sut.validate(null)).toBeFalsy();
     expect(spyValidateSync).toHaveBeenCalled();
-    expect(sut.validateData).toBeNull(); // Vai ser null, pois, os dados passos anteriormente são null
+    expect(sut.validateData).toBeNull();
     expect(sut.errors).toStrictEqual({ field: ['test error'] });
   });
 
