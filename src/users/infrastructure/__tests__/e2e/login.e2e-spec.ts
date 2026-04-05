@@ -48,10 +48,13 @@ describe('UserController POST login e2e tests', () => {
   describe('POST /users/login', () => {
     it('Should authenticate a user', async () => {
       const passHash = await hashProvider.generateHash(signinDto.password);
+
       const entity = new UserEntity(
         userDataBuilder({ email: signinDto.email, password: passHash }),
       );
-      repository.insert(entity);
+
+      await repository.insert(entity);
+
       const res = await request(app.getHttpServer())
         .post('/users/login')
         .send(signinDto)
@@ -128,7 +131,7 @@ describe('UserController POST login e2e tests', () => {
       const entity = new UserEntity(
         userDataBuilder({ email: signinDto.email, password: passHash }),
       );
-      repository.insert(entity);
+      await repository.insert(entity);
 
       const res = await request(app.getHttpServer())
         .post('/users/login')
