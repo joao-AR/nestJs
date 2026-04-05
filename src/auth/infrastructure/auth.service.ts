@@ -5,7 +5,7 @@ export type GenerateJwtProps = {
   accessToken: string;
 };
 
-type VerifyJwtProps = {
+export type VerifyJwtProps = {
   id: string;
   iat: number;
   exp: number;
