@@ -12,6 +12,7 @@ import { applyGlobalConfig } from '@/global-config';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { AuthService } from '@/auth/infrastructure/auth.service';
 
 describe('UserController GET e2e tests', () => {
   let app: INestApplication;
@@ -20,6 +21,9 @@ describe('UserController GET e2e tests', () => {
 
   let prismaService: PrismaService;
   let entity: UserEntity;
+  let authService: AuthService;
+  let accessToken: string;
+
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
@@ -32,18 +36,22 @@ describe('UserController GET e2e tests', () => {
 
     repository = module.get<UserRepository>('UserRepository');
     prismaService = module.get<PrismaService>(PrismaService);
+    authService = module.get<AuthService>(AuthService);
   });
 
   beforeEach(async () => {
     await prismaService.user.deleteMany();
     entity = new UserEntity(userDataBuilder({}));
     await repository.insert(entity);
+    const jwt = await authService.generateJwt(entity.id);
+    accessToken = jwt.accessToken;
   });
 
   describe('GET /users/:id', () => {
     it('Should get a user', async () => {
       const res = await request(app.getHttpServer())
-        .get(`/users/${entity._id}`)
+        .get(`/users/${entity.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       const presenter = UsersController.userToResponse(entity.toJson());
@@ -51,9 +59,14 @@ describe('UserController GET e2e tests', () => {
       expect(res.body.data).toStrictEqual(serialized);
     });
 
+    it('Should return error with 401 code when user is not authenticated', async () => {
+      await request(app.getHttpServer()).get(`/users/${entity.id}`).expect(401);
+    });
+
     it('Should return error with 404 code when id is invalid', async () => {
       await request(app.getHttpServer())
         .get('/users/fakeId')
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(404)
         .expect({
           statusCode: 404,

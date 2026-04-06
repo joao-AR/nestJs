@@ -13,6 +13,7 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { UpdateUserDto } from '../../dto/update-user.dto';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { AuthService } from '@/auth/infrastructure/auth.service';
 
 describe('UserController PUT e2e tests', () => {
   let app: INestApplication;
@@ -21,6 +22,9 @@ describe('UserController PUT e2e tests', () => {
   let updateUserDto: UpdateUserDto;
   let prismaService: PrismaService;
   let entity: UserEntity;
+  let accessToken: string;
+  let authService: AuthService;
+
   beforeAll(async () => {
     setupPrismaTests();
     module = await Test.createTestingModule({
@@ -33,6 +37,7 @@ describe('UserController PUT e2e tests', () => {
 
     repository = module.get<UserRepository>('UserRepository');
     prismaService = module.get<PrismaService>(PrismaService);
+    authService = module.get<AuthService>(AuthService);
   });
 
   beforeEach(async () => {
@@ -43,16 +48,20 @@ describe('UserController PUT e2e tests', () => {
     await prismaService.user.deleteMany();
     entity = new UserEntity(userDataBuilder({}));
     await repository.insert(entity);
+
+    const jwt = await authService.generateJwt(entity.id);
+    accessToken = jwt.accessToken;
   });
 
   describe('PUT /users/:id', () => {
     it('Should update a user', async () => {
       const res = await request(app.getHttpServer())
-        .put(`/users/${entity._id}`)
+        .put(`/users/${entity.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updateUserDto)
         .expect(200);
 
-      const user = await repository.findById(entity._id);
+      const user = await repository.findById(entity.id);
 
       const presenter = UsersController.userToResponse(user.toJson());
       const serialized = instanceToPlain(presenter);
@@ -62,7 +71,8 @@ describe('UserController PUT e2e tests', () => {
     it('Should return error with 422 code when request body is invalid', async () => {
       delete updateUserDto.name;
       const res = await request(app.getHttpServer())
-        .put(`/users/${entity._id}`)
+        .put(`/users/${entity.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updateUserDto)
         .expect(422);
 
@@ -74,8 +84,9 @@ describe('UserController PUT e2e tests', () => {
     });
 
     it('Should return error with 404 code when id is invalid', async () => {
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .put('/users/fakeId')
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updateUserDto)
         .expect(404)
         .expect({
@@ -83,6 +94,13 @@ describe('UserController PUT e2e tests', () => {
           error: 'Not Found',
           message: 'UserModel not found using ID fakeId',
         });
+    });
+
+    it('Should return error with 401 code when user is not authenticated', async () => {
+      await request(app.getHttpServer())
+        .put('/users/fakeId')
+        .send(updateUserDto)
+        .expect(401);
     });
   });
 });

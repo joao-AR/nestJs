@@ -12,6 +12,7 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { AuthService } from '@/auth/infrastructure/auth.service';
 
 describe('UserController PATCH e2e tests', () => {
   let app: INestApplication;
@@ -22,6 +23,8 @@ describe('UserController PATCH e2e tests', () => {
   let prismaService: PrismaService;
   let hashProvider: HashProvider;
   let entity: UserEntity;
+  let accessToken: string;
+  let authService: AuthService;
 
   beforeAll(async () => {
     setupPrismaTests();
@@ -36,6 +39,7 @@ describe('UserController PATCH e2e tests', () => {
     repository = module.get<UserRepository>('UserRepository');
     prismaService = module.get<PrismaService>(PrismaService);
     hashProvider = module.get<HashProvider>('hashProvider');
+    authService = module.get<AuthService>(AuthService);
   });
 
   beforeEach(async () => {
@@ -48,16 +52,19 @@ describe('UserController PATCH e2e tests', () => {
     const hashedPassword = await hashProvider.generateHash('old_pass');
     entity = new UserEntity(userDataBuilder({ password: hashedPassword }));
     await repository.insert(entity);
+    const jwt = await authService.generateJwt(entity.id);
+    accessToken = jwt.accessToken;
   });
 
   describe('PATCH /users/:id', () => {
     it('Should update a user password', async () => {
       await request(app.getHttpServer())
-        .patch(`/users/${entity._id}`)
+        .patch(`/users/${entity.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updatePasswordDto)
         .expect(200);
 
-      const user = await repository.findById(entity._id);
+      const user = await repository.findById(entity.id);
 
       const checkNewsPass = await hashProvider.compareHash(
         'new_pass',
@@ -67,9 +74,17 @@ describe('UserController PATCH e2e tests', () => {
       expect(checkNewsPass).toBeTruthy();
     });
 
+    it('Should return error with 401 code when user is not authenticated', async () => {
+      await request(app.getHttpServer())
+        .patch(`/users/${entity.id}`)
+        .send(updatePasswordDto)
+        .expect(401);
+    });
+
     it('Should return error with 422 code when request body is invalid', async () => {
       const res = await request(app.getHttpServer())
-        .patch(`/users/${entity._id}`)
+        .patch(`/users/${entity.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({})
         .expect(422);
 
@@ -85,6 +100,7 @@ describe('UserController PATCH e2e tests', () => {
     it('Should return error with 404 code when id is invalid', async () => {
       await request(app.getHttpServer())
         .patch('/users/fakeId')
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updatePasswordDto)
         .expect(404)
         .expect({
@@ -98,6 +114,7 @@ describe('UserController PATCH e2e tests', () => {
       delete updatePasswordDto.oldPassword;
       const res = await request(app.getHttpServer())
         .patch(`/users/${entity._id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updatePasswordDto)
         .expect(422);
 
@@ -112,6 +129,7 @@ describe('UserController PATCH e2e tests', () => {
       delete updatePasswordDto.password;
       const res = await request(app.getHttpServer())
         .patch(`/users/${entity._id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updatePasswordDto)
         .expect(422);
 
@@ -126,6 +144,7 @@ describe('UserController PATCH e2e tests', () => {
       updatePasswordDto.oldPassword = 'fakePass';
       await request(app.getHttpServer())
         .patch(`/users/${entity._id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updatePasswordDto)
         .expect(422)
         .expect({
