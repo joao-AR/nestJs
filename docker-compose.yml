@@ -1,6 +1,8 @@
 services:
   db:
-    build: .
+    build: 
+      context: .
+      dockerfile: dockerfile.database
     container_name: api-db
     restart: always
     tty: true
@@ -11,3 +13,27 @@ services:
     environment:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=projectdb
+    networks:
+      - api
+
+  app:
+    build: 
+      context: .
+      target: development
+    env_file: .env.development
+    container_name: api-app
+    restart: always
+    depends_on: [db]
+    ports:
+      - '80:80'
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - api
+
+networks:
+  api:
+    driver: bridge
+
