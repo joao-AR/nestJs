@@ -38,4 +38,5 @@ services:
 networks:
   api:
     driver: bridge
+    name: nest-shared-network
 
