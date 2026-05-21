@@ -78,11 +78,19 @@ export class UsersController {
 
   @ApiResponse({
     status: 200,
+    description: 'Success Login',
     schema: {
       type: 'object',
       properties: {
-        accessToken: {
-          type: 'string',
+        data: {
+          type: 'object',
+          properties: {
+            accessToken: {
+              type: 'string',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+            user: { $ref: getSchemaPath(UserPresenter) },
+          },
         },
       },
     },
@@ -171,6 +179,20 @@ export class UsersController {
     status: 404,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            user: { $ref: getSchemaPath(UserPresenter) },
+          },
+        },
+      },
+    },
+  })
   @Get(':id')
   @UseGuards(AuthGuard)
   async findOne(@Param('id') id: string) {
@@ -191,6 +213,20 @@ export class UsersController {
   @ApiResponse({
     status: 422,
     description: 'Invalid request body',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            user: { $ref: getSchemaPath(UserPresenter) },
+          },
+        },
+      },
+    },
   })
   @Put(':id')
   @UseGuards(AuthGuard)
