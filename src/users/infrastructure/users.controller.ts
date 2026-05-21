@@ -102,8 +102,14 @@ export class UsersController {
   @HttpCode(200)
   @Post('login')
   async login(@Body() signinDto: SigninDto) {
-    const output = await this.signinUseCase.execute(signinDto);
-    return this.authService.generateJwt(output.id);
+    const response = await this.signinUseCase.execute(signinDto);
+    const UserOutput = UsersController.userToResponse(response);
+    const accessToken = await this.authService.generateJwt(response.id);
+    const output = {
+      ...accessToken,
+      user: { ...UserOutput },
+    };
+    return output;
   }
 
   @ApiBearerAuth()
@@ -169,7 +175,9 @@ export class UsersController {
   @UseGuards(AuthGuard)
   async findOne(@Param('id') id: string) {
     const output = await this.getUserUseCase.execute({ id });
-    return UsersController.userToResponse(output);
+    const user = UsersController.userToResponse(output);
+
+    return { user };
   }
 
   @ApiResponse({
@@ -191,7 +199,8 @@ export class UsersController {
       id,
       ...updateUserDto,
     });
-    return UsersController.userToResponse(output);
+    const user = UsersController.userToResponse(output);
+    return { user };
   }
 
   @ApiResponse({
