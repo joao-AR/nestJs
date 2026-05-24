@@ -1,4 +1,4 @@
-import { UserEntity } from '@/users/domain/entities/user.entity';
+import { UserEntity, UserRole } from '@/users/domain/entities/user.entity';
 
 export type UserOutputDto = {
   id: string;
@@ -6,6 +6,7 @@ export type UserOutputDto = {
   email: string;
   password: string;
   createdAt: Date;
+  roles?: UserRole[];
 };
 
 export class UserOutPutMapper {

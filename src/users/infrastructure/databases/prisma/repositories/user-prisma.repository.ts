@@ -16,8 +16,20 @@ export class UserPrismaRepository implements UserRepository {
     try {
       const user = await this.prismaService.user.findUnique({
         where: { email },
+        include: {
+          roles: {
+            include: {
+              role: true,
+            },
+          },
+        },
       });
-      return UserModelMapper.toEntity(user);
+
+      const roles = user.roles.map(role => ({
+        id: role.role.id,
+        role: role.role.role,
+      }));
+      return UserModelMapper.toEntity(user, roles);
     } catch {
       throw new NotFoundError(`UserModel not found using email ${email}`);
     }
@@ -59,6 +71,7 @@ export class UserPrismaRepository implements UserRepository {
           },
         },
       }),
+      include: { roles: { include: { role: true } } },
       orderBy: {
         [orderByField]: orderByDir,
       },
@@ -67,7 +80,9 @@ export class UserPrismaRepository implements UserRepository {
     });
 
     return new UserSearchResult({
-      items: models.map(model => UserModelMapper.toEntity(model)),
+      items: models.map(model => {
+        return UserModelMapper.toEntity(model);
+      }),
       total: count,
       currentPage: props.page,
       perPage: props.perPage,
@@ -78,8 +93,18 @@ export class UserPrismaRepository implements UserRepository {
   }
 
   async insert(entity: UserEntity): Promise<void> {
+    const { roles, ...entityData } = entity.toJson();
     await this.prismaService.user.create({
-      data: entity.toJson(),
+      data: {
+        ...entityData,
+        roles: {
+          createMany: {
+            data: entity.roles.map(role => ({
+              roleId: role.id,
+            })),
+          },
+        },
+      },
     });
   }
 

@@ -18,7 +18,12 @@
     "test:int": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.int.config.ts",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.e2e.config.ts"
+    "test:e2e": "npx dotenv-cli -e .env.test -- jest --runInBand --config ./jest.e2e.config.ts",
+    "seed": "npx prisma db seed --schema ./src/shared/infrastructure/database/prisma/schema.prisma"
+  },
+  "prisma": {
+    "schema": "src/shared/infrastructure/database/prisma/schema.prisma",
+    "seed": "ts-node --transpile-only ./src/shared/infrastructure/database/prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/middie": "^9.0.3",

@@ -39,6 +39,7 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Roles } from '@/shared/infrastructure/decorators/Roles.decorator';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -112,7 +113,10 @@ export class UsersController {
   async login(@Body() signinDto: SigninDto) {
     const response = await this.signinUseCase.execute(signinDto);
     const UserOutput = UsersController.userToResponse(response);
-    const accessToken = await this.authService.generateJwt(response.id);
+    const accessToken = await this.authService.generateJwt(
+      response.id,
+      response.roles || [],
+    );
     const output = {
       ...accessToken,
       user: { ...UserOutput },
@@ -165,6 +169,7 @@ export class UsersController {
   })
   @Get()
   @UseGuards(AuthGuard)
+  @Roles(['admin'])
   async search(@Query() searchPrams: ListUsersDto) {
     const output = await this.listUsersUseCase.execute(searchPrams);
     return UsersController.listUsersToResponse(output);
