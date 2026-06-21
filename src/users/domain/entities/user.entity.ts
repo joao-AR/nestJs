@@ -7,6 +7,12 @@ export type UserProps = {
   email: string;
   password: string;
   createdAt?: Date;
+  roles?: UserRole[];
+};
+
+export type UserRole = {
+  id: number;
+  role: string;
 };
 
 export class UserEntity extends Entity<UserProps> {
@@ -17,6 +23,7 @@ export class UserEntity extends Entity<UserProps> {
     UserEntity.validate(props);
     super(props, id);
     this.props.createdAt = this.props.createdAt ?? new Date();
+    this.props.roles = this.props.roles ?? [];
   }
 
   updateName(value: string) {
@@ -51,6 +58,10 @@ export class UserEntity extends Entity<UserProps> {
 
   get createdAt() {
     return this.props.createdAt;
+  }
+
+  get roles() {
+    return this.props.roles || [];
   }
 
   static validate(props: UserProps) {
