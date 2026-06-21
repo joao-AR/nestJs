@@ -12,9 +12,12 @@ describe('DeleteUserUseCase integration tests', () => {
   let sut: DeleteUserUseCase;
   let prismaService: PrismaService;
   let module: TestingModule;
+  let schemaId: string;
 
   beforeAll(async () => {
-    setupPrismaTests();
+    const setupResult = setupPrismaTests();
+    schemaId = setupResult.schemaId;
+    process.env.DATABASE_URL = setupResult.isolatedDatabaseUrl;
     module = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
@@ -42,6 +45,14 @@ describe('DeleteUserUseCase integration tests', () => {
     await prismaService.user.deleteMany();
   });
 
+  afterAll(async () => {
+    await prismaService.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,
+    );
+    await prismaService.$disconnect();
+    await module.close();
+  });
+
   it('Should throw error when entity not found', async () => {
     await expect(() => sut.execute({ id: 'fakeId' })).rejects.toThrow(
       new NotFoundError('UserModel not found using ID fakeId'),
@@ -50,8 +61,10 @@ describe('DeleteUserUseCase integration tests', () => {
 
   it('Should delete an user', async () => {
     const entity = new UserEntity(userDataBuilder({}));
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { roles, ...userData } = entity.toJson();
     await prismaService.user.create({
-      data: entity.toJson(),
+      data: userData,
     });
 
     await sut.execute({ id: entity._id });
