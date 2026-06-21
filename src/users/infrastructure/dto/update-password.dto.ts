@@ -1,8 +1,7 @@
-import { UpdateUserPasswordInput } from '@/users/application/usecases/updateUserPassword.usecase';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class UpdatePasswordDto implements Omit<UpdateUserPasswordInput, 'id'> {
+export class UpdatePasswordDto {
   @ApiProperty({ description: 'User password' })
   @IsString()
   @IsNotEmpty()
