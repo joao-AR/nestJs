@@ -7,6 +7,7 @@ import { NotFoundError } from '@/shared/domain/errors/not-found-error';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 describe('DeleteUserUseCase integration tests', () => {
   let sut: DeleteUserUseCase;
@@ -22,7 +23,7 @@ describe('DeleteUserUseCase integration tests', () => {
       imports: [DatabaseModule],
       providers: [
         {
-          provide: UserPrismaRepository,
+          provide: 'UserRepository',
           useFactory: (prismaService: PrismaService) => {
             return new UserPrismaRepository(prismaService);
           },
@@ -30,9 +31,9 @@ describe('DeleteUserUseCase integration tests', () => {
         },
         {
           provide: DeleteUserUseCase,
-          useFactory: (userRepository: UserPrismaRepository) =>
+          useFactory: (userRepository: UserRepository) =>
             new DeleteUserUseCase(userRepository),
-          inject: [UserPrismaRepository],
+          inject: ['UserRepository'],
         },
       ],
     }).compile();

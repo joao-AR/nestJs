@@ -7,38 +7,52 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { UpdateUserUseCase } from '../../updateUserName.usecase';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 describe('UpdateUserUseCase integration tests', () => {
   let sut: UpdateUserUseCase;
-  let repository: UserPrismaRepository;
   let module: TestingModule;
   let prismaService: PrismaService;
+  let schemaId: string;
 
   beforeAll(async () => {
-    setupPrismaTests();
+    const setupResult = setupPrismaTests();
+    schemaId = setupResult.schemaId;
+    process.env.DATABASE_URL = setupResult.isolatedDatabaseUrl;
+
     module = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
         {
-          provide: UserPrismaRepository,
+          provide: 'UserRepository',
           useFactory: (prismaService: PrismaService) => {
             return new UserPrismaRepository(prismaService);
           },
           inject: [PrismaService],
         },
+        {
+          provide: UpdateUserUseCase,
+          useFactory: (userRepository: UserRepository) => {
+            return new UpdateUserUseCase(userRepository);
+          },
+          inject: ['UserRepository']
+        }
       ],
     }).compile();
 
-    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
     prismaService = module.get<PrismaService>(PrismaService);
+    sut = module.get<UpdateUserUseCase>(UpdateUserUseCase);
   });
 
   beforeEach(async () => {
-    sut = new UpdateUserUseCase(repository);
     await prismaService.user.deleteMany();
   });
 
   afterAll(async () => {
+    await prismaService.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,
+    );
+    await prismaService.$disconnect();
     await module.close();
   });
 
@@ -50,8 +64,9 @@ describe('UpdateUserUseCase integration tests', () => {
 
   it('Should update an user', async () => {
     const entity = new UserEntity(userDataBuilder({}));
+    const { roles, ...userData } = entity.toJson();
     await prismaService.user.create({
-      data: entity.toJson(),
+      data: userData,
     });
 
     const output = await sut.execute({ id: entity._id, name: 'New name' });

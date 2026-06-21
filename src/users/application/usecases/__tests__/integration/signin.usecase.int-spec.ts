@@ -11,6 +11,7 @@ import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-prov
 import { InvalidCredentialsError } from '@/shared/application/errors/invalid-credentials-error';
 import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 describe('SignInUseCase integration tests', () => {
   let sut: SignInUseCase;
@@ -18,33 +19,51 @@ describe('SignInUseCase integration tests', () => {
   let hashProvider: HashProvider;
   let module: TestingModule;
   let prismaService: PrismaService;
+  let schemaId: string;
 
   beforeAll(async () => {
-    setupPrismaTests();
+    const setupResult = setupPrismaTests();
+    schemaId = setupResult.schemaId;
+    process.env.DATABASE_URL = setupResult.isolatedDatabaseUrl;
+    
     module = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
         {
-          provide: UserPrismaRepository,
+          provide: 'UserRepository',
           useFactory: (prismaService: PrismaService) => {
             return new UserPrismaRepository(prismaService);
           },
           inject: [PrismaService],
         },
+        {
+          provide: 'HashProvider',
+          useClass: BcryptjsHashProvider,
+        },
+        {
+          provide: SignInUseCase,
+          useFactory: (userRepository: UserRepository, hashProvider: HashProvider) => {
+            return new SignInUseCase(userRepository, hashProvider);
+          },
+          inject: ['UserRepository', 'HashProvider']
+        }
       ],
     }).compile();
 
-    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
-    hashProvider = new BcryptjsHashProvider();
     prismaService = module.get<PrismaService>(PrismaService);
+    hashProvider = module.get<HashProvider>('HashProvider');
+    sut = module.get<SignInUseCase>(SignInUseCase);
   });
 
   beforeEach(async () => {
-    sut = new SignInUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 
   afterAll(async () => {
+    await prismaService.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,
+    );
+    await prismaService.$disconnect();
     await module.close();
   });
 
@@ -57,8 +76,9 @@ describe('SignInUseCase integration tests', () => {
   it('Should throw error when user password does not match', async () => {
     const userPass = await hashProvider.generateHash('1234');
     const entity = new UserEntity(userDataBuilder({ password: userPass }));
+    const { roles, ...userData } = entity.toJson();
     await prismaService.user.create({
-      data: entity.toJson(),
+      data: userData,
     });
 
     await expect(() =>
@@ -85,8 +105,9 @@ describe('SignInUseCase integration tests', () => {
     const userPass = await hashProvider.generateHash('1234');
 
     const entity = new UserEntity(userDataBuilder({ password: userPass }));
+    const { roles, ...userData } = entity.toJson();
     await prismaService.user.create({
-      data: entity.toJson(),
+      data: userData,
     });
 
     const output = await sut.execute({

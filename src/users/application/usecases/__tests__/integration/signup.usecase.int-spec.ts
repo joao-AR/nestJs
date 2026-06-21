@@ -6,40 +6,58 @@ import { SignUpUseCase } from '../../signup.usecase';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { BcryptjsHashProvider } from '@/users/infrastructure/providers/hash-provider/bcryptjs-hash.provider';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 describe('SignUpUseCase integration tests', () => {
   let sut: SignUpUseCase;
-  let repository: UserPrismaRepository;
   let module: TestingModule;
   let hashProvider: HashProvider;
   let prismaService: PrismaService;
+  let schemaId: string;
 
   beforeAll(async () => {
-    setupPrismaTests();
+    const setupResult = setupPrismaTests();
+    schemaId = setupResult.schemaId;
+    process.env.DATABASE_URL = setupResult.isolatedDatabaseUrl;
+
     module = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
         {
-          provide: UserPrismaRepository,
+          provide: 'UserRepository',
           useFactory: (prismaService: PrismaService) => {
             return new UserPrismaRepository(prismaService);
           },
           inject: [PrismaService],
         },
+        {
+          provide: 'HashProvider',
+          useClass: BcryptjsHashProvider,
+        },
+        {
+          provide: SignUpUseCase,
+          useFactory: (userRepository: UserRepository, hashProvider: HashProvider) => {
+            return new SignUpUseCase(userRepository, hashProvider);
+          },
+          inject: ['UserRepository', 'HashProvider']
+        }
       ],
     }).compile();
 
-    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
-    hashProvider = new BcryptjsHashProvider();
+    hashProvider = module.get<HashProvider>('HashProvider');
     prismaService = module.get<PrismaService>(PrismaService);
+    sut = module.get<SignUpUseCase>(SignUpUseCase);
   });
 
   beforeEach(async () => {
-    sut = new SignUpUseCase(repository, hashProvider);
     await prismaService.user.deleteMany();
   });
 
   afterAll(async () => {
+    await prismaService.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,
+    );
+    await prismaService.$disconnect();
     await module.close();
   });
 

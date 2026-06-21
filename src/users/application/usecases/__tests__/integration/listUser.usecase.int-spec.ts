@@ -6,38 +6,55 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { ListUsersUseCase } from '../../listUsers.usecase';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
+import { UserRepository } from '@/users/domain/repositories/user.repository';
 
 describe('ListUsersUseCase integration tests', () => {
   let sut: ListUsersUseCase;
-  let repository: UserPrismaRepository;
+  let repository: UserRepository;
   let module: TestingModule;
   let prismaService: PrismaService;
+  let schemaId: string;
 
   beforeAll(async () => {
-    setupPrismaTests();
+    const setupResult = setupPrismaTests();
+    schemaId = setupResult.schemaId;
+    process.env.DATABASE_URL = setupResult.isolatedDatabaseUrl;
+
     module = await Test.createTestingModule({
       imports: [DatabaseModule],
       providers: [
         {
-          provide: UserPrismaRepository,
+          provide: 'UserRepository',
           useFactory: (prismaService: PrismaService) => {
             return new UserPrismaRepository(prismaService);
           },
           inject: [PrismaService],
         },
+        {
+          provide: ListUsersUseCase,
+          useFactory: (userRepository: UserRepository) => {
+            return new ListUsersUseCase(userRepository);
+          },
+          inject: ['UserRepository'],
+        },
       ],
     }).compile();
 
-    repository = module.get<UserPrismaRepository>(UserPrismaRepository);
+    repository = module.get<UserRepository>('UserRepository');
     prismaService = module.get<PrismaService>(PrismaService);
+
+    sut = module.get<ListUsersUseCase>(ListUsersUseCase)
   });
 
   beforeEach(async () => {
-    sut = new ListUsersUseCase(repository);
     await prismaService.user.deleteMany();
   });
 
   afterAll(async () => {
+    await prismaService.$executeRawUnsafe(
+      `DROP SCHEMA IF EXISTS "${schemaId}" CASCADE;`,
+    );
+    await prismaService.$disconnect();
     await module.close();
   });
 
@@ -57,7 +74,10 @@ describe('ListUsersUseCase integration tests', () => {
     });
 
     await prismaService.user.createMany({
-      data: entities.map(item => item.toJson()),
+      data: entities.map(item => {
+        const {roles, ...userData} = item.toJson();
+        return userData;
+      }),
     });
 
     const output = await sut.execute({});
@@ -86,7 +106,10 @@ describe('ListUsersUseCase integration tests', () => {
     });
 
     await prismaService.user.createMany({
-      data: entities.map(item => item.toJson()),
+      data: entities.map(item => {
+        const {roles, ...userData} = item.toJson();
+        return userData;
+      }),
     });
 
     const output = await sut.execute({
