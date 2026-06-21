@@ -2,9 +2,7 @@ import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { UserOutputDto, UserOutPutMapper } from '../dto/user-output';
 import { UseCase as DefaultUseCase } from '@/shared/application/usecases/use-case';
 import { UserRepository } from '@/users/domain/repositories/user.repository';
-import { BadRequestError } from '@/shared/application/errors/bad-request-error';
 import { InvalidPasswordError } from '@/shared/application/errors/invalid-password-error';
-import { password } from '@inquirer/prompts';
 
 export type UpdateUserPasswordInput = {
   id: string;
