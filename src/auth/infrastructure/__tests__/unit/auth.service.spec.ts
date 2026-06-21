@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from '../../auth.service';
+import { AuthService } from '../../services/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { EnvConfigService } from '@/shared/infrastructure/env-config/env-config.service';
 

@@ -31,8 +31,8 @@ import {
   UserCollectionPresenter,
   UserPresenter,
 } from '../presenters/user.presenter';
-import { AuthService } from '@/auth/infrastructure/auth.service';
-import { AuthGuard } from '@/auth/infrastructure/auth.guard';
+import { AuthService } from '@/auth/infrastructure/services/auth.service';
+import { AuthGuard } from '@/auth/infrastructure/guards/auth.guard';
 import {
   ApiBearerAuth,
   ApiResponse,

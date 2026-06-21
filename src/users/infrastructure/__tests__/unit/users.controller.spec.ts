@@ -23,7 +23,7 @@ import { ListUsersUseCase } from '@/users/application/usecases/listUsers.usecase
 import {
   AuthService,
   GenerateJwtProps,
-} from '@/auth/infrastructure/auth.service';
+} from '@/auth/infrastructure/services/auth.service';
 
 import { Test, TestingModule } from '@nestjs/testing';
 

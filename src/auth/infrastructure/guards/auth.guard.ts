@@ -1,7 +1,7 @@
 import {
   AuthService,
   VerifyJwtProps,
-} from '@/auth/infrastructure/auth.service';
+} from '@/auth/infrastructure/services/auth.service';
 import { Roles } from '@/shared/infrastructure/decorators/Roles.decorator';
 import { UserRole } from '@/users/domain/entities/user.entity';
 import {
@@ -11,10 +11,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-
 import { FastifyRequest as Request } from 'fastify';
+import extractTokenFromHeader from '../utils/extract-token.util';
 
-export interface RequestWithUser extends Request {
+export interface RequestWithUser
+  extends Request<{ Params: { userId?: string } }> {
   user: {
     jwt: VerifyJwtProps;
     roles: UserRole[];
@@ -30,7 +31,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const token = this.extractTokenFromHeader(request);
+    const token = extractTokenFromHeader(request);
     const requiredRoles = this.reflector.get(Roles, context.getHandler());
     if (!token) {
       throw new UnauthorizedException();
@@ -60,10 +61,5 @@ export class AuthGuard implements CanActivate {
     return requiredRoles.every(requiredRole =>
       userRolesLower.has(requiredRole.toLowerCase()),
     );
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

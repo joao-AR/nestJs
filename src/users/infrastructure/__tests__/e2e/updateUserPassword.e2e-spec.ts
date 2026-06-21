@@ -12,7 +12,7 @@ import { UserEntity } from '@/users/domain/entities/user.entity';
 import { userDataBuilder } from '@/users/domain/testing/helpers/user-data-builder';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
-import { AuthService } from '@/auth/infrastructure/auth.service';
+import { AuthService } from '@/auth/infrastructure/services/auth.service';
 
 describe('UserController PATCH e2e tests', () => {
   let app: INestApplication;
