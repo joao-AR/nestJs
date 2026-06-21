@@ -25,6 +25,7 @@ describe('UserEntity integration test', () => {
 
       props = {
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         name: 10 as any,
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidatorError);
@@ -51,6 +52,7 @@ describe('UserEntity integration test', () => {
 
       props = {
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         email: 10 as any,
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidatorError);
@@ -77,6 +79,7 @@ describe('UserEntity integration test', () => {
 
       props = {
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password: 10 as any,
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidatorError);
@@ -85,12 +88,14 @@ describe('UserEntity integration test', () => {
     it('Should throw an error when creating a user with invalid createdAt', () => {
       let props: UserProps = {
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         createdAt: '2025' as any,
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidatorError);
 
       props = {
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         createdAt: 10 as any,
       };
 
@@ -99,7 +104,7 @@ describe('UserEntity integration test', () => {
 
     it('Should be a valid user', () => {
       expect.assertions(0); // expect that the code result zero problems
-      let props: UserProps = {
+      const props: UserProps = {
         ...userDataBuilder({}),
       };
       new UserEntity(props);
