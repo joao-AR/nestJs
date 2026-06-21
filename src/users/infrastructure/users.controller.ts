@@ -40,6 +40,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { Roles } from '@/shared/infrastructure/decorators/Roles.decorator';
+import { UserOwnershipGuard } from '@/auth/infrastructure/guards/user-ownership.guard';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -198,9 +199,10 @@ export class UsersController {
       },
     },
   })
-  @Get(':id')
-  @UseGuards(AuthGuard)
-  async findOne(@Param('id') id: string) {
+  @Get(':userId')
+  @Roles(['user', 'admin'])
+  @UseGuards(AuthGuard, UserOwnershipGuard)
+  async findOne(@Param('userId') id: string) {
     const output = await this.getUserUseCase.execute({ id });
     const user = UsersController.userToResponse(output);
 
@@ -233,9 +235,13 @@ export class UsersController {
       },
     },
   })
-  @Put(':id')
-  @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  @Put(':userId')
+  @Roles(['user', 'admin'])
+  @UseGuards(AuthGuard, UserOwnershipGuard)
+  async update(
+    @Param('userId') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     const output = await this.updateUserUseCase.execute({
       id,
       ...updateUserDto,
@@ -244,6 +250,7 @@ export class UsersController {
     return { user };
   }
 
+  @ApiBearerAuth()
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
@@ -256,10 +263,11 @@ export class UsersController {
     status: 422,
     description: 'Invalid request body',
   })
-  @Patch(':id')
-  @UseGuards(AuthGuard)
+  @Patch(':userId')
+  @Roles(['user', 'admin'])
+  @UseGuards(AuthGuard, UserOwnershipGuard)
   async updatePassword(
-    @Param('id') id: string,
+    @Param('userId') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     const output = await this.updateUserPasswordUseCase.execute({
@@ -270,6 +278,7 @@ export class UsersController {
     return UsersController.userToResponse(output);
   }
 
+  @ApiBearerAuth()
   @ApiResponse({
     status: 204,
     description: 'Exclusion Success',
@@ -283,9 +292,10 @@ export class UsersController {
     description: 'User not found',
   })
   @HttpCode(204)
-  @Delete(':id')
-  @UseGuards(AuthGuard)
-  async remove(@Param('id') id: string) {
+  @Delete(':userId')
+  @UseGuards(AuthGuard, UserOwnershipGuard)
+  @Roles(['user', 'admin'])
+  async remove(@Param('userId') id: string) {
     await this.deleteUserUseCase.execute({ id });
   }
 }
