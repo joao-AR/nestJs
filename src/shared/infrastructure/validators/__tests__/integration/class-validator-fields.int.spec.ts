@@ -15,9 +15,19 @@ class StubRules {
     Object.assign(this, data);
   }
 }
-class StubClassValidatorFields extends ClassValidatorFields<StubRules> {
-  validate(data: any): boolean {
-    return super.validate(new StubRules(data));
+
+type StubInputs = {
+  name: string;
+  price: number;
+};
+
+class StubClassValidatorFields extends ClassValidatorFields<
+  StubInputs,
+  StubRules
+> {
+  validate(data: StubInputs): boolean {
+    const stubRules = new StubRules(data);
+    return super.validate(data, stubRules);
   }
 }
 
@@ -41,8 +51,9 @@ describe('ClassValidatorField integration tests', () => {
   it('Should validate without errors', () => {
     const validator = new StubClassValidatorFields();
     expect(validator.validate({ name: 'test name', price: 12 })).toBeTruthy();
-    expect(validator.validateData).toStrictEqual(
-      new StubRules({ name: 'test name', price: 12 }),
-    );
+    expect(validator.validateData).toStrictEqual({
+      name: 'test name',
+      price: 12,
+    });
   });
 });

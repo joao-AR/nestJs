@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { SignUpUseCase } from '../application/usecases/signup.usecase';
 import { BcryptjsHashProvider } from './providers/hash-provider/bcryptjs-hash.provider';
 import { UserRepository } from '../domain/repositories/user.repository';
@@ -13,6 +13,8 @@ import { UsersController } from './users.controller';
 import { PrismaService } from '@/shared/infrastructure/database/prisma/prisma.service';
 import { UserPrismaRepository } from './databases/prisma/repositories/user-prisma.repository';
 import { AuthModule } from '@/auth/auth.module';
+import { UserEntity } from '../domain/entities/user.entity';
+import { UserValidatorFactory } from './validators/user.validator';
 
 const userRep = {
   provide: 'UserRepository',
@@ -91,4 +93,8 @@ const userRep = {
     },
   ],
 })
-export class UsersModule {}
+export class UsersModule implements OnModuleInit {
+  onModuleInit() {
+    UserEntity.setValidator(UserValidatorFactory.create());
+  }
+}

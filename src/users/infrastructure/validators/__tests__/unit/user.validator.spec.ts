@@ -24,6 +24,7 @@ describe('UserValidator unit tests', () => {
 
   describe('Name field', () => {
     it('Invalidation cases for name field ', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       let isValid = sut.validate(null as any);
       expect(isValid).toBeFalsy();
       expect(sut.errors['name']).toStrictEqual([
@@ -34,12 +35,14 @@ describe('UserValidator unit tests', () => {
 
       isValid = sut.validate({
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         name: '' as any,
       });
       expect(sut.errors['name']).toStrictEqual(['name should not be empty']);
 
       isValid = sut.validate({
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         name: 10 as any,
       });
       expect(sut.errors['name']).toStrictEqual([
@@ -59,6 +62,7 @@ describe('UserValidator unit tests', () => {
 
   describe('Email field', () => {
     it('Invalidation cases for email field ', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       let isValid = sut.validate(null as any);
       expect(isValid).toBeFalsy();
       expect(sut.errors['email']).toStrictEqual([
@@ -76,6 +80,7 @@ describe('UserValidator unit tests', () => {
         'email should not be empty',
       ]);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       isValid = sut.validate({ ...userDataBuilder({}), email: 10 as any });
       expect(isValid).toBeFalsy();
 
@@ -110,6 +115,7 @@ describe('UserValidator unit tests', () => {
 
       isValid = sut.validate({
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password: '' as any,
       });
       expect(sut.errors['password']).toStrictEqual([
@@ -118,6 +124,7 @@ describe('UserValidator unit tests', () => {
 
       isValid = sut.validate({
         ...userDataBuilder({}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password: 10 as any,
       });
       expect(sut.errors['password']).toStrictEqual([
@@ -137,12 +144,14 @@ describe('UserValidator unit tests', () => {
 
   describe('CreatedAt field', () => {
     it('Invalidation cases for CreatedAt field ', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       let isValid = sut.validate({ ...props, createdAt: 10 as any });
       expect(isValid).toBeFalsy();
       expect(sut.errors['createdAt']).toStrictEqual([
         'createdAt must be a Date instance',
       ]);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       isValid = sut.validate({ ...props, createdAt: '2023' as any });
       expect(isValid).toBeFalsy();
       expect(sut.errors['createdAt']).toStrictEqual([

@@ -6,8 +6,8 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { UserProps } from '../entities/user.entity';
-import { ClassValidatorFields } from '../entities/validator/class-validator-fields';
+import { UserProps } from '../../domain/entities/user.entity';
+import { ClassValidatorFields } from '@/shared/infrastructure/validators/class-validator-fields';
 
 export class UserRules {
   @MaxLength(255)
@@ -35,9 +35,11 @@ export class UserRules {
   }
 }
 
-export class UserValidator extends ClassValidatorFields<UserRules> {
+export class UserValidator extends ClassValidatorFields<UserProps, UserRules> {
   validate(data: UserProps): boolean {
-    return super.validate(new UserRules(data ?? ({} as UserProps)));
+    const userData = data ?? ({} as UserProps);
+    const userRules = new UserRules(userData);
+    return super.validate(data, userRules);
   }
 }
 

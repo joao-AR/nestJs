@@ -1,8 +1,14 @@
 import { ClassValidatorFields } from '../../class-validator-fields';
 import * as libClassValidator from 'class-validator';
-class StubClassValidatorFields extends ClassValidatorFields<{
+
+type StubFields = {
   field: string;
-}> {}
+};
+
+class StubClassValidatorFields extends ClassValidatorFields<
+  StubFields,
+  { field: string }
+> {}
 
 describe('ClassValidatorFields unit tests', () => {
   it('Should initialize errors and validateData Variables with null', () => {
@@ -24,7 +30,7 @@ describe('ClassValidatorFields unit tests', () => {
 
     const sut = new StubClassValidatorFields();
 
-    expect(sut.validate(null)).toBeFalsy();
+    expect(sut.validate(null, null)).toBeFalsy();
     expect(spyValidateSync).toHaveBeenCalled();
     expect(sut.validateData).toBeNull();
     expect(sut.errors).toStrictEqual({ field: ['test error'] });
@@ -35,7 +41,7 @@ describe('ClassValidatorFields unit tests', () => {
     spyValidateSync.mockReturnValue([]);
     const sut = new StubClassValidatorFields();
 
-    expect(sut.validate({ field: 'value' })).toBeTruthy();
+    expect(sut.validate({ field: 'value' }, { field: 'value' })).toBeTruthy();
     expect(spyValidateSync).toHaveBeenCalled();
     expect(sut.validateData).toStrictEqual({ field: 'value' });
     expect(sut.errors).toBeNull();
